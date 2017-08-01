@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, current_app
 from flask_restful import Resource, Api
 from flask_restful.utils import cors
 
@@ -178,7 +178,11 @@ class ZoneData(Resource):
         return ret_val
 
 
-#api.add_resource(PowerData, '/')
+class Root(Resource):
+    def get(self):
+        return current_app.send_static_file('index.html')
+
+api.add_resource(Root, '/')
 api.add_resource(PowerData, '/PowerData/<int:resource_id>')
 api.add_resource(ZoneData, '/ZoneData')
 
