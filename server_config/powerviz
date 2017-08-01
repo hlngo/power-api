@@ -1,0 +1,21 @@
+# The upstream component nginx needs to connect to
+#TODO: One big question is why Nginx let the /data* pass through while the other words, say api, can't
+#       For example: location /api { ... } would not work
+
+server {
+    listen 8080;
+    server_name highroad.pnl.gov;
+
+    root /var/lib/powerviz/static;
+    index index.html;
+
+    location / {
+        # Rewrite static UI to openeis-ui
+        # rewrite ^/(index.html|index.htm|index)?$ /static/afdd.html last;
+        #try_files $uri $uri/ =404;
+        include uwsgi_params;
+        uwsgi_pass unix:/var/run/powerviz/uwsgi.sock;
+    }
+
+}
+
