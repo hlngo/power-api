@@ -47,15 +47,23 @@ class PowerData(Resource):
 
             data_cur = self.mongodb["data"].find(find_params).limit(1).sort([("ts", -1)])
             records = data_cur[:]
-            for record in records:
+            for record in records.limit(1):
                 values = json.loads(record['value']['string_value'])
 
                 for key, value in values.items():
                     # should check for timezone in meta instead of assuming this is local_tz
                     ts = datetime.fromtimestamp(float(key)/1000.0, pytz.utc)
                     ts = ts.astimezone(self.local_tz)
-                    if ts.day < cur_time.day:
-                        ts = ts + timedelta(hours=24)
+                    # circular shift 1-hour
+                    ts = ts + timedelta(hours=1)
+
+                    #
+                    # This section below needs to be revised carefully if we want to show more than a day
+                    # align to current day
+                    if ts.day != cur_time.day:
+                        ts = ts.replace(year=cur_time.year, month=cur_time.month, day=cur_time.day)
+
+                    #
                     ret_val.append({
                         'ts': format_ts(ts),
                         'value': value
@@ -75,9 +83,14 @@ class PowerData(Resource):
                 values = json.loads(record['value']['string_value'])
                 start = parser.parse(values['start']).astimezone(tz=self.local_tz)
                 end = parser.parse(values['end']).astimezone(tz=self.local_tz)
+
+                # circular shift 1-hour
+                start = start + timedelta(hours=1)
+                end = end + timedelta(hours=1)
+
                 ret_val.append({
-                    'ts': format_ts(start),
-                    #'end': format_ts(end),
+                    #'ts': format_ts(start),
+                    'ts': format_ts(end),
                     #'cbp': values['cbp'],
                     'value': values['target']
                 })
@@ -107,6 +120,7 @@ class PowerData(Resource):
             ret_val = sorted(ret_val, key=lambda k: k['ts'])
 
         output = False
+        # Remember the baseline is modified before it so it is not the raw data anymore
         if output:
             import csv
             keys = ret_val[0].keys()
@@ -167,8 +181,10 @@ class ZoneData(Resource):
         records = data_cur[:]
 
         for record in records:
+            ts = record['ts']
+            ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
             ret_val.append({
-                'ts': format_ts(record['ts']),
+                'ts': format_ts(ts),
                 'value': record['value']
             })
 
@@ -192,4 +208,4 @@ def format_ts(ts):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=8000)

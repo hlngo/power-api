@@ -112,7 +112,7 @@ var Configuration = (function () {
     //public Server: string = "http://ddc.pnl.gov:5000/";
     //public Server: string = "http://172.18.69.117:8080/";
     Configuration.prototype.GetServer = function () {
-        var server = 'http://localhost:5000/api/';
+        var server = 'http://localhost:8000/api/';
         if (window.location.hostname.includes('ddc')) {
             server = 'http://ddc.pnl.gov:5000/api/';
         }
@@ -937,8 +937,37 @@ var ZoneComfortComponent = (function () {
             height: 500,
             width: 1200,
             yaxis: {
-                title: 'Temperature (F)'
-            }
+                title: 'Temperature (F)',
+                range: [65, 80]
+            },
+            shapes: [
+                //High limit
+                {
+                    type: 'line',
+                    'xref': 'paper',
+                    'x0': 0,
+                    'y0': 78,
+                    'x1': 1,
+                    'y1': 78,
+                    'line': {
+                        color: 'red',
+                        width: 3
+                    }
+                },
+                //Low limit
+                {
+                    type: 'line',
+                    'xref': 'paper',
+                    'x0': 0,
+                    'y0': 68,
+                    'x1': 1,
+                    'y1': 68,
+                    'line': {
+                        color: 'red',
+                        width: 3
+                    }
+                }
+            ]
         };
         this.PlotlyData = [];
         for (var _i = 0, _a = this.equips; _i < _a.length; _i++) {
