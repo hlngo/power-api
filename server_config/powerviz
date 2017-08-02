@@ -9,13 +9,15 @@ server {
     root /var/lib/powerviz/static;
     index index.html;
 
-    location / {
-        # Rewrite static UI to openeis-ui
-        # rewrite ^/(index.html|index.htm|index)?$ /static/afdd.html last;
-        #try_files $uri $uri/ =404;
+    location ^~ /api/ {
         include uwsgi_params;
         uwsgi_pass unix:/var/run/powerviz/uwsgi.sock;
     }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
 
 }
 

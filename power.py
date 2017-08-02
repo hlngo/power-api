@@ -182,9 +182,9 @@ class Root(Resource):
     def get(self):
         return current_app.send_static_file('index.html')
 
-api.add_resource(Root, '/')
-api.add_resource(PowerData, '/PowerData/<int:resource_id>')
-api.add_resource(ZoneData, '/ZoneData')
+api.add_resource(Root, '/api/')
+api.add_resource(PowerData, '/api/PowerData/<int:resource_id>')
+api.add_resource(ZoneData, '/api/ZoneData')
 
 
 def format_ts(ts):

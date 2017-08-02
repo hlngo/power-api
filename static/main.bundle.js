@@ -112,12 +112,12 @@ var Configuration = (function () {
     //public Server: string = "http://ddc.pnl.gov:5000/";
     //public Server: string = "http://172.18.69.117:8080/";
     Configuration.prototype.GetServer = function () {
-        var server = 'http://localhost:5000/';
+        var server = 'http://localhost:5000/api/';
         if (window.location.hostname.includes('ddc')) {
-            server = 'http://ddc.pnl.gov:5000/';
+            server = 'http://ddc.pnl.gov:5000/api/';
         }
         if (window.location.hostname.includes('highroad')) {
-            server = 'https://highroad.pnl.gov/';
+            server = 'https://highroad.pnl.gov:8080/api/';
         }
         return server;
     };
