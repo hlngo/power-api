@@ -117,7 +117,7 @@ var Configuration = (function () {
             server = 'http://ddc.pnl.gov:5000/api/';
         }
         if (window.location.hostname.includes('highroad')) {
-            server = 'https://highroad.pnl.gov:8080/api/';
+            server = 'http://highroad.pnl.gov:8080/api/';
         }
         return server;
     };
