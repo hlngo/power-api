@@ -25,6 +25,7 @@ class PowerData(Resource):
         self.mongodb = mongoclient.get_default_database()
 
         self.local_tz = pytz.timezone('US/Pacific')
+        self.delta_in_min = 75
 
     def get(self, resource_id):
         ret_val = []
@@ -56,7 +57,7 @@ class PowerData(Resource):
                     ts = ts.astimezone(self.local_tz)
                     # circular shift 1-hour
                     #ts = ts + timedelta(hours=1)
-                    ts = ts + timedelta(minutes=15)
+                    ts = ts + timedelta(minutes=self.delta_in_min)
 
                     #
                     # This section below needs to be revised carefully if we want to show more than a day
@@ -88,8 +89,8 @@ class PowerData(Resource):
                 # circular shift 1-hour
                 #start = start + timedelta(hours=1)
                 #end = end + timedelta(hours=1)
-                start = start + timedelta(minutes=15)
-                end = end + timedelta(minutes=15)
+                start = start + timedelta(minutes=self.delta_in_min)
+                end = end + timedelta(minutes=self.delta_in_min)
 
                 ret_val.append({
                     'ts': format_ts(start),
@@ -196,15 +197,76 @@ class ZoneData(Resource):
 
         return ret_val
 
+class ZoneDataByDate(Resource):
+    def __init__(self):
+        self.batch_size = 10000
+        params = {'hostsandports': 'vc-db.pnl.gov', 'user': 'reader',
+                  'passwd': 'volttronReader', 'database': 'prod_historian'}
+        mongo_uri = "mongodb://{user}:{passwd}@{hostsandports}/{database}"
+        mongo_uri = mongo_uri.format(**params)
+        mongoclient = pymongo.MongoClient(mongo_uri, connect=False)
+        self.mongodb = mongoclient.get_default_database()
+
+        self.local_tz = pytz.timezone('US/Pacific')
+
+    def get(self, date):
+        ret_val = []
+        topic = request.args.get('topic')
+
+        cur_time = parser.parse(date)
+        cur_time = datetime.now(tz=self.local_tz)
+        cur_time = cur_time.replace(hour=0, minute=0, second=0, microsecond=0)
+        start_date_utc = cur_time.astimezone(pytz.utc)
+        end_date_utc = start_date_utc + timedelta(hours=24)
+        ts_filter = {
+            "$gte": start_date_utc,
+            "$lte": end_date_utc
+        }
+
+        parts = topic.split(',')
+        topic = '/'.join(parts)
+        find_params = {
+            'topic_name': topic
+        }
+        data_cur = self.mongodb["topics"].find(find_params)
+        records = data_cur[:]
+
+        topic_id = None
+        for record in records:
+            topic_id = record['_id']
+
+        if topic_id is None:
+            return ret_val
+
+        find_params = {
+            'topic_id': topic_id,
+            'ts': ts_filter
+        }
+
+        data_cur = self.mongodb["data"].find(find_params).batch_size(self.batch_size)
+        records = data_cur[:]
+
+        for record in records:
+            ts = record['ts']
+            ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
+            ret_val.append({
+                'ts': format_ts(ts),
+                'value': record['value']
+            })
+
+        if ret_val is not None:
+            ret_val = sorted(ret_val, key=lambda k: k['ts'])
+
+        return ret_val
 
 class Root(Resource):
     def get(self):
         return current_app.send_static_file('index.html')
 
-api.add_resource(Root, '/api/')
 api.add_resource(PowerData, '/api/PowerData/<int:resource_id>')
+api.add_resource(ZoneDataByDate, '/api/ZoneData/<string:date>')
 api.add_resource(ZoneData, '/api/ZoneData')
-
+api.add_resource(Root, '/api/')
 
 def format_ts(ts):
     return ts.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
