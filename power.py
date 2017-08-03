@@ -45,7 +45,7 @@ class PowerData(Resource):
                 'ts': ts_filter
             }
 
-            data_cur = self.mongodb["data"].find(find_params).limit(1).sort([("ts", -1)])
+            data_cur = self.mongodb["data"].find(find_params).sort([("ts", -1)])
             records = data_cur[:]
             for record in records.limit(1):
                 values = json.loads(record['value']['string_value'])
@@ -55,7 +55,8 @@ class PowerData(Resource):
                     ts = datetime.fromtimestamp(float(key)/1000.0, pytz.utc)
                     ts = ts.astimezone(self.local_tz)
                     # circular shift 1-hour
-                    ts = ts + timedelta(hours=1)
+                    #ts = ts + timedelta(hours=1)
+                    ts = ts + timedelta(minutes=15)
 
                     #
                     # This section below needs to be revised carefully if we want to show more than a day
@@ -85,12 +86,14 @@ class PowerData(Resource):
                 end = parser.parse(values['end']).astimezone(tz=self.local_tz)
 
                 # circular shift 1-hour
-                start = start + timedelta(hours=1)
-                end = end + timedelta(hours=1)
+                #start = start + timedelta(hours=1)
+                #end = end + timedelta(hours=1)
+                start = start + timedelta(minutes=15)
+                end = end + timedelta(minutes=15)
 
                 ret_val.append({
-                    #'ts': format_ts(start),
-                    'ts': format_ts(end),
+                    'ts': format_ts(start),
+                    #'ts': format_ts(end),
                     #'cbp': values['cbp'],
                     'value': values['target']
                 })

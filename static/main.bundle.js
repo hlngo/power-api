@@ -940,6 +940,24 @@ var ZoneComfortComponent = (function () {
                 title: 'Temperature (F)',
                 range: [65, 80]
             },
+            annotations: [
+                {
+                    text: 'High Limit',
+                    xref: 'paper',
+                    x: 0.01,
+                    y: 78,
+                    yshift: 10,
+                    showarrow: false
+                },
+                {
+                    text: 'Low Limit',
+                    xref: 'paper',
+                    x: 0.01,
+                    y: 68,
+                    yshift: -10,
+                    showarrow: false
+                }
+            ],
             shapes: [
                 //High limit
                 {
@@ -951,7 +969,7 @@ var ZoneComfortComponent = (function () {
                     'y1': 78,
                     'line': {
                         color: 'red',
-                        width: 3
+                        width: 2
                     }
                 },
                 //Low limit
@@ -964,7 +982,7 @@ var ZoneComfortComponent = (function () {
                     'y1': 68,
                     'line': {
                         color: 'red',
-                        width: 3
+                        width: 2
                     }
                 }
             ]
