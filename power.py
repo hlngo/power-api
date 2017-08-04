@@ -25,7 +25,7 @@ class PowerData(Resource):
         self.mongodb = mongoclient.get_default_database()
 
         self.local_tz = pytz.timezone('US/Pacific')
-        self.delta_in_min = 15
+        self.delta_in_min = 60 #15
 
     def get(self, resource_id):
         ret_val = []
@@ -100,8 +100,8 @@ class PowerData(Resource):
                     end = end + timedelta(minutes=self.delta_in_min)
 
                     ret_val.append({
-                        'ts': format_ts(start),
-                        #'ts': format_ts(end),
+                        #'ts': format_ts(start),
+                        'ts': format_ts(end),
                         #'cbp': values['cbp'],
                         'value': values['target']
                     })
