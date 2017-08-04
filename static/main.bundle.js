@@ -675,7 +675,7 @@ var PowerComponent = (function () {
             mode: 'lines+markers'
         };
         var powerTrace = {
-            name: 'Actual-15 minute Avg',
+            name: 'Actual-30 minute Avg',
             x: [],
             y: [],
             mode: 'lines'
@@ -1067,6 +1067,10 @@ var ZoneComfortComponent = (function () {
         this.building = '350_BUILDING';
         this.equips = ['HP1B', 'HP7'];
         this.points = ['ZoneTemperature', 'CoolingTemperatureSetPoint'];
+        this.pointLabels = {
+            'ZoneTemperature': 'Zone Temperature',
+            'CoolingTemperatureSetPoint': 'Cooling Temperature Set Point'
+        };
         this.alive = true;
         this.interval = 1000;
         this.timer = __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__["Observable"].timer(this.interval, this.interval);
@@ -1135,7 +1139,7 @@ var ZoneComfortComponent = (function () {
             for (var _b = 0, _c = this.points; _b < _c.length; _b++) {
                 var point = _c[_b];
                 this.PlotlyData.push({
-                    name: equip + "_" + point,
+                    name: equip + " " + this.pointLabels[point],
                     x: [],
                     y: [],
                     mode: 'lines'
