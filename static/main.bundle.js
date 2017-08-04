@@ -658,7 +658,8 @@ var PowerComponent = (function () {
             height: 500,
             width: 1200,
             yaxis: {
-                title: 'Whole Building Electricity Consumption (kWh)'
+                title: 'Whole Building Electricity Consumption (kWh)',
+                range: [0, 200]
             }
         };
         var baselineTrace = {
