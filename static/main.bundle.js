@@ -34,7 +34,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 var appRoutes = [
     { path: '', component: __WEBPACK_IMPORTED_MODULE_2_app_app_component__["a" /* AppComponent */] },
-    { path: ':date', component: __WEBPACK_IMPORTED_MODULE_2_app_app_component__["a" /* AppComponent */] },
     { path: '**', component: __WEBPACK_IMPORTED_MODULE_3_app_page_not_found_page_not_found_component__["a" /* PageNotFoundComponent */] }
 ];
 var AppRoutingModule = (function () {
@@ -45,7 +44,7 @@ var AppRoutingModule = (function () {
 AppRoutingModule = __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["b" /* NgModule */])({
         imports: [
-            __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* RouterModule */].forRoot(appRoutes, { enableTracing: true } // <-- debugging purposes only
+            __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* RouterModule */].forRoot(appRoutes //, { enableTracing: true } // <-- debugging purposes only
             )
         ],
         exports: [
@@ -79,7 +78,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/app.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!--The whole content below can be removed with the new code.-->\n<div style=\"text-align:center\">\n  <h1>\n    {{title1}}\n  </h1>\n  <h1 *ngIf=\"title2\">\n    {{title2}}\n  </h1>\n</div>\n\n<!-- <div *ngIf=\"SecureToken\"> -->\n   <app-power #app_power [secureToken]=\"SecureToken\">\n    Loading...\n  </app-power> \n   <app-zone-comfort #app_zone_comfort>Loading...</app-zone-comfort>  \n<!-- </div> -->"
+module.exports = "<!--The whole content below can be removed with the new code.-->\n<div style=\"text-align:center\">\n  <h1>\n    {{title1}}\n  </h1>\n  <h1 *ngIf=\"title2\">\n    {{title2}}\n  </h1> \n</div>\n<div>\n  <div *ngIf=\"ViewDate\"> \n    <app-power [viewDate]=\"ViewDate\" [secureToken]=\"SecureToken\">Loading...</app-power> \n    <app-zone-comfort [viewDate]=\"ViewDate\">Loading...</app-zone-comfort>  \n  </div> \n</div>\n\n"
 
 /***/ }),
 
@@ -116,8 +115,22 @@ var AppComponent = (function () {
     }
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._route.paramMap
-            .switchMap(function (params) { return _this.date = params.get('date'); });
+        this.sub = this._route
+            .queryParams
+            .skip(1)
+            .subscribe(function (params) {
+            // Defaults to 0 if no query param provided.
+            _this.ViewDate = params['date'] || 0;
+            console.log("Date1 is: " + _this.ViewDate);
+        });
+        //This is because the Observable is behavior object
+        //  1st subscribe always returns undefined -> thus, skip(1) above
+        //Give 300ms for all params are assigned (e.g., ViewDate) before checking ViewDate
+        setTimeout(function () {
+            if (!_this.ViewDate) {
+                _this.ViewDate = '0';
+            }
+        }, 300);
         //Get Secure Token
         // this._authService.GetSecureToken()
         //   .subscribe(
@@ -128,6 +141,9 @@ var AppComponent = (function () {
     AppComponent.prototype.setSecureToken = function (data) {
         this.SecureToken = data['result'];
         console.log(this.SecureToken);
+    };
+    AppComponent.prototype.ngOnDestroy = function () {
+        this.sub.unsubsribe();
     };
     return AppComponent;
 }());
@@ -190,9 +206,9 @@ Configuration = __decorate([
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__ = __webpack_require__("../../../platform-browser/@angular/platform-browser.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__("../../../http/@angular/http.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__ = __webpack_require__("../../../platform-browser/@angular/platform-browser.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__("../../../http/@angular/http.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_app_app_routing_module__ = __webpack_require__("../../../../../src/app/app-routing.module.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_component__ = __webpack_require__("../../../../../src/app/app.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plotly_plotly_component__ = __webpack_require__("../../../../../src/app/plotly/plotly.component.ts");
@@ -223,7 +239,7 @@ var AppModule = (function () {
     return AppModule;
 }());
 AppModule = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__angular_core__["b" /* NgModule */])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["b" /* NgModule */])({
         declarations: [
             __WEBPACK_IMPORTED_MODULE_4__app_component__["a" /* AppComponent */],
             __WEBPACK_IMPORTED_MODULE_5__plotly_plotly_component__["a" /* PlotlyComponent */],
@@ -232,8 +248,8 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_9__page_not_found_page_not_found_component__["a" /* PageNotFoundComponent */]
         ],
         imports: [
-            __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
-            __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* HttpModule */],
+            __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["a" /* BrowserModule */],
+            __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* HttpModule */],
             __WEBPACK_IMPORTED_MODULE_3_app_app_routing_module__["a" /* AppRoutingModule */]
         ],
         providers: [__WEBPACK_IMPORTED_MODULE_7__app_constants__["a" /* Configuration */]],
@@ -242,6 +258,31 @@ AppModule = __decorate([
 ], AppModule);
 
 //# sourceMappingURL=app.module.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/page-not-found/page-not-found.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/page-not-found/page-not-found.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<div>\n  Page Not Found\n</div>\n"
 
 /***/ }),
 
@@ -268,10 +309,10 @@ var PageNotFoundComponent = (function () {
 }());
 PageNotFoundComponent = __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* Component */])({
-        template: '<h2>Page not found</h2>'
-        // selector: 'app-page-not-found',
-        // templateUrl: './page-not-found.component.html',
-        // styleUrls: ['./page-not-found.component.css']
+        //template: '<h2>Page not found</h2>'
+        selector: 'app-page-not-found',
+        template: __webpack_require__("../../../../../src/app/page-not-found/page-not-found.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/page-not-found/page-not-found.component.css")]
     }),
     __metadata("design:paramtypes", [])
 ], PageNotFoundComponent);
@@ -301,7 +342,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/plotly/plotly.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div style=\"margin-bottom:100px;\">\n    <div [attr.id]=\"plotId\"\n         style=\"width: 480px; height: 400px;\">\n        <!-- Chart will be drawn inside this DIV -->\n    </div>\n</div>\n<button (click)=\"onReplay()\">Replay</button>\n<div *ngIf=\"displayRawData\">\n    raw data:\n    <hr />\n    <span>{{data | json}}</span>\n    <hr />\n    layout:\n    <hr />\n    <span>{{layout | json}}</span>\n    <hr />\n</div>"
+module.exports = "<div style=\"margin-bottom:100px;\">\n    <div [attr.id]=\"plotId\" style=\"width: 480px; height: 400px;\">\n        <!-- Chart will be drawn inside this DIV -->\n    </div>\n</div>\n<button (click)=\"onReplay()\">Replay</button>\n<div *ngIf=\"displayRawData\">\n    raw data:\n    <hr />\n    <span>{{data | json}}</span>\n    <hr />\n    layout:\n    <hr />\n    <span>{{layout | json}}</span>\n    <hr />\n</div>"
 
 /***/ }),
 
@@ -640,11 +681,11 @@ var PowerComponent = (function () {
         };
         this.PlotlyData = [baselineTrace, targetTrace, powerTrace];
         //Initial get
-        this._powerDataService.GetAllBaseline()
+        this._powerDataService.GetAllBaseline(this.viewDate)
             .subscribe(function (data) { return _this.setNewData(data, 0); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllBaseline completed.'); });
-        this._powerDataService.GetAllTarget()
+        this._powerDataService.GetAllTarget(this.viewDate)
             .subscribe(function (data) { return _this.setNewData(data, 1); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllTarget completed.'); });
-        this._powerDataService.GetAllPower()
+        this._powerDataService.GetAllPower(this.viewDate)
             .subscribe(function (data) { return _this.setNewData(data, 2); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPower completed.'); });
         //Timer to pull new dasta
         // this.timer
@@ -694,6 +735,10 @@ __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
     __metadata("design:type", Object)
 ], PowerComponent.prototype, "secureToken", void 0);
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", String)
+], PowerComponent.prototype, "viewDate", void 0);
 __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* ViewChild */])('targetChart'),
     __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
@@ -855,19 +900,19 @@ var PowerDataService = (function () {
                 headers: _this.headers
             }).map(function (res) { return res.json(); });
         };
-        this.GetAllBaseline = function () {
+        this.GetAllBaseline = function (viewDate) {
             console.log('Get GetAllBaseline starting...');
-            return _this._http.get(_this.actionUrl + "/" + _this.allBaselineEndPoint, {
+            return _this._http.get(_this.actionUrl + "/" + _this.allBaselineEndPoint + "?date=" + viewDate, {
                 headers: _this.headers
             }).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
         };
-        this.GetAllTarget = function () {
+        this.GetAllTarget = function (viewDate) {
             console.log('Get GetAllTarget starting...');
-            return _this._http.get(_this.actionUrl + "/" + _this.allTargetEndPoint, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
+            return _this._http.get(_this.actionUrl + "/" + _this.allTargetEndPoint + "?date=" + viewDate, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
         };
-        this.GetAllPower = function () {
+        this.GetAllPower = function (viewDate) {
             console.log('Get GetAllPower starting...');
-            return _this._http.get(_this.actionUrl + "/" + _this.allPowerEndPoint, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
+            return _this._http.get(_this.actionUrl + "/" + _this.allPowerEndPoint + "?date=" + viewDate, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
         };
         this.actionUrl = "" + _configuration.GetServer() + this.serviceName;
         this.headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
@@ -931,12 +976,12 @@ var ZoneDataService = (function () {
         this._http = _http;
         this._configuration = _configuration;
         this.serviceName = 'ZoneData'; //'jsonrpc';
-        this.GetZoneData = function (site, building, equip, point) {
+        this.GetZoneData = function (site, building, equip, point, viewDate) {
             //let params = new URLSearchParams();
             //params.set('topic', `${site},${building},${equip},${point}`);
             //params.set('topic', 'PNNL,350_BUILDING,HP1B,ZoneTemperature');
             console.log('Get GetZoneData starting...');
-            return _this._http.get(_this.actionUrl + "?topic=" + site + "," + building + "," + equip + "," + point, {
+            return _this._http.get(_this.actionUrl + "?topic=" + site + "," + building + "," + equip + "," + point + "&date=" + viewDate, {
                 headers: _this.headers
             }).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
         };
@@ -1100,7 +1145,7 @@ var ZoneComfortComponent = (function () {
         var idx = -1;
         var _loop_1 = function (equip) {
             var _loop_2 = function (point) {
-                this_1._zoneDataService.GetZoneData(this_1.site, this_1.building, equip, point)
+                this_1._zoneDataService.GetZoneData(this_1.site, this_1.building, equip, point, this_1.viewDate)
                     .subscribe(function (data) {
                     idx++;
                     _this.setNewData(data, _this.site, _this.building, equip, point, idx);
@@ -1138,6 +1183,10 @@ var ZoneComfortComponent = (function () {
     };
     return ZoneComfortComponent;
 }());
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", String)
+], ZoneComfortComponent.prototype, "viewDate", void 0);
 __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* ViewChild */])('zoneChart'),
     __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_3_app_plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_app_plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
