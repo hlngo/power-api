@@ -1147,13 +1147,14 @@ var ZoneComfortComponent = (function () {
             }
         }
         //Initial get
-        var idx = -1;
+        var idx = 0;
         var _loop_1 = function (equip) {
             var _loop_2 = function (point) {
+                var curIdx = idx; //create local scope variable to use with call-back
+                idx++;
                 this_1._zoneDataService.GetZoneData(this_1.site, this_1.building, equip, point, this_1.viewDate)
                     .subscribe(function (data) {
-                    idx++;
-                    _this.setNewData(data, _this.site, _this.building, equip, point, idx);
+                    _this.setNewData(data, _this.site, _this.building, equip, point, curIdx);
                 }, function (error) { return console.log(error.json().error); }, function () { return console.log("Get " + _this.site + "/" + _this.building + "/" + equip + "/" + point + " completed."); });
             };
             for (var _i = 0, _a = this_1.points; _i < _a.length; _i++) {
