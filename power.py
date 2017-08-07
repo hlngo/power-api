@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import pytz
 import dateutil.tz
 from dateutil import parser
+import traceback
 
 app = Flask(__name__)
 api = Api(app, decorators=[cors.crossdomain(origin='*')])
@@ -96,12 +97,18 @@ class PowerData(Resource):
                     # circular shift 1-hour
                     #start = start + timedelta(hours=1)
                     #end = end + timedelta(hours=1)
-                    start = start + timedelta(minutes=self.delta_in_min)
-                    end = end + timedelta(minutes=self.delta_in_min)
+
+                    ts = start
+                    if start < datetime(2017, 8, 7, 0, 0, tzinfo=self.local_tz):
+                        start = start + timedelta(minutes=self.delta_in_min)
+                        end = end + timedelta(minutes=self.delta_in_min)
+                        ts = end
+
 
                     ret_val.append({
+                        'ts': format_ts(ts),
                         #'ts': format_ts(start),
-                        'ts': format_ts(end),
+                        #'ts': format_ts(end),
                         #'cbp': values['cbp'],
                         'value': values['target']
                     })
@@ -138,8 +145,10 @@ class PowerData(Resource):
                     dict_writer = csv.DictWriter(output_file, keys)
                     dict_writer.writeheader()
                     dict_writer.writerows(ret_val)
-        except:
-            return  ret_val
+        except Exception, exc:
+            traceback.print_exc()
+            print(exc)
+            return ret_val
 
         return ret_val
 
