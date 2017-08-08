@@ -65,7 +65,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, "h1 {\n    line-height: 0.8em;\n}", ""]);
 
 // exports
 
@@ -78,7 +78,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/app.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!--The whole content below can be removed with the new code.-->\n<div style=\"text-align:center\">\n  <h1>\n    {{title1}}\n  </h1>\n  <h1 *ngIf=\"title2\">\n    {{title2}}\n  </h1> \n</div>\n<div>\n  <div *ngIf=\"ViewDate\"> \n    <app-power [viewDate]=\"ViewDate\" [secureToken]=\"SecureToken\">Loading...</app-power> \n    <app-zone-comfort [viewDate]=\"ViewDate\">Loading...</app-zone-comfort>  \n  </div> \n</div>\n\n"
+module.exports = "<!--The whole content below can be removed with the new code.-->\n<div style=\"text-align:center\">\n  <h1>\n    {{title1}}\n  </h1>\n  <h1 *ngIf=\"title2\">\n    {{title2}}\n  </h1> \n</div>\n<div>\n  <div *ngIf=\"ViewDate\"> \n    <app-power [viewDate]=\"ViewDate\" [secureToken]=\"SecureToken\">Loading...</app-power> \n    <app-zone-comfort [viewDate]=\"ViewDate\">Loading...</app-zone-comfort>\n  </div> \n</div>\n\n"
 
 /***/ }),
 
@@ -110,7 +110,7 @@ var AppComponent = (function () {
         this._authService = _authService;
         this._route = _route;
         this._router = _router;
-        this.title1 = 'Building 350 - Transactive Control';
+        this.title1 = 'PNNL Building 350 - Transactive Control';
         this.title2 = 'Intelligent Load Control';
     }
     AppComponent.prototype.ngOnInit = function () {
@@ -342,7 +342,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/plotly/plotly.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div style=\"margin-bottom:100px;\">\n    <div [attr.id]=\"plotId\" style=\"width: 480px; height: 400px;\">\n        <!-- Chart will be drawn inside this DIV -->\n    </div>\n</div>\n<button (click)=\"onReplay()\">Replay</button>\n<div *ngIf=\"displayRawData\">\n    raw data:\n    <hr />\n    <span>{{data | json}}</span>\n    <hr />\n    layout:\n    <hr />\n    <span>{{layout | json}}</span>\n    <hr />\n</div>"
+module.exports = "<div style=\"margin-bottom:100px;\">\n    <div [attr.id]=\"plotId\">\n        <!-- Chart will be drawn inside this DIV -->\n    </div>\n</div>\n<button (click)=\"onReplay()\">Replay</button>\n<div *ngIf=\"displayRawData\">\n    raw data:\n    <hr />\n    <span>{{data | json}}</span>\n    <hr />\n    layout:\n    <hr />\n    <span>{{layout | json}}</span>\n    <hr />\n</div>"
 
 /***/ }),
 
@@ -655,30 +655,71 @@ var PowerComponent = (function () {
         this.PlotlyId = 'power_plot';
         this.PlotlyLayout = {
             title: "",
-            height: 500,
-            width: 1200,
+            height: 600,
+            width: 1420,
+            margin: {
+                l: 80,
+                r: 50,
+                b: 50,
+                t: 50,
+                pad: 4
+            },
+            xaxis: {
+                title: '<b>Time</b>',
+                tickformat: "%-I %p",
+                nticks: 30,
+                titlefont: {
+                    size: 16
+                },
+                tickfont: {
+                    size: 14
+                }
+            },
             yaxis: {
-                title: 'Whole Building Electricity Consumption (kWh)',
-                range: [0, 200]
+                title: '<b>Whole Building Electricity Consumption (kWh)</b>',
+                range: [0, 200],
+                zerolinewidth: 3,
+                titlefont: {
+                    size: 16
+                },
+                tickfont: {
+                    size: 14
+                }
+            },
+            legend: {
+                x: 0.84,
+                y: 1,
+                font: {
+                    size: 14
+                }
             }
         };
         var baselineTrace = {
             name: 'Baseline',
             x: [],
             y: [],
-            mode: 'lines+markers'
+            mode: 'lines+markers',
+            'line': {
+                width: 3
+            }
         };
         var targetTrace = {
             name: 'Price-Responsive Target',
             x: [],
             y: [],
-            mode: 'lines+markers'
+            mode: 'lines+markers',
+            'line': {
+                width: 3
+            }
         };
         var powerTrace = {
-            name: 'Actual-30 minute Avg',
+            name: 'Actual',
             x: [],
             y: [],
-            mode: 'lines'
+            mode: 'lines',
+            'line': {
+                width: 3
+            }
         };
         this.PlotlyData = [baselineTrace, targetTrace, powerTrace];
         //Initial get
@@ -717,10 +758,19 @@ var PowerComponent = (function () {
         //Refort data to Plotly format
         var newPlotlyData = { x: [[], [], []], y: [[], [], []] };
         //for (let d of data['result']) {
+        var curDateTime = (new Date).getTime();
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
             var d = data_1[_i];
-            newPlotlyData['x'][traceIdx].push(d['ts']);
-            newPlotlyData['y'][traceIdx].push(d['value']);
+            if (traceIdx != 1) {
+                newPlotlyData['x'][traceIdx].push(d['ts']);
+                newPlotlyData['y'][traceIdx].push(d['value']);
+            }
+            else {
+                if (Date.parse(d['ts']) <= curDateTime) {
+                    newPlotlyData['x'][traceIdx].push(d['ts']);
+                    newPlotlyData['y'][traceIdx].push(d['value']);
+                }
+            }
         }
         this.targetChart.ExtendTraces(newPlotlyData, [0, 1, 2]);
     };
@@ -1080,8 +1130,15 @@ var ZoneComfortComponent = (function () {
         this.PlotlyId = 'zone_plot';
         this.PlotlyLayout = {
             title: "",
-            height: 500,
-            width: 1200,
+            height: 600,
+            width: 1420,
+            margin: {
+                l: 80,
+                r: 50,
+                b: 50,
+                t: 50,
+                pad: 4
+            },
             yaxis: {
                 title: 'Temperature (F)',
                 range: [65, 80]
@@ -1128,7 +1185,7 @@ var ZoneComfortComponent = (function () {
                     'y1': 68,
                     'line': {
                         color: 'red',
-                        width: 2
+                        width: 2.5
                     }
                 }
             ]
