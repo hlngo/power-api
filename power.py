@@ -128,7 +128,7 @@ class PowerData(Resource):
                     topic_id = ObjectId("5978c6c5c56e526f28984f13")
                 elif func == '60min' or func == '60m' or func == '1h' or func == '1hour' or func == 'hourly':
                     # PNNL / 350_BUILDING / METERS / WholeBuildingPowerWithoutShopAirCompressor
-                    topic_id = ObjectId("56de38d6c56e5232da276a51"),
+                    topic_id = ObjectId("56de38d6c56e5232da276a51")
                     hourly = True
                 elif func == 'exp' or func == 'exponential':
                     #350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/LoadControlPower
