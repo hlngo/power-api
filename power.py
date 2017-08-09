@@ -11,6 +11,7 @@ import pytz
 import dateutil.tz
 from dateutil import parser
 import traceback
+import pandas as pd
 
 app = Flask(__name__)
 api = Api(app, decorators=[cors.crossdomain(origin='*')])
@@ -32,12 +33,12 @@ class PowerData(Resource):
         ret_val = []
 
         try:
+            #date param
             cur_time = request.args.get('date')
             if cur_time is None or cur_time == '0':
                 cur_time = datetime.now(tz=self.local_tz)
             else:
                 cur_time = self.local_tz.localize(parser.parse(cur_time))
-
             cur_time = cur_time.replace(hour=0, minute=0, second=0, microsecond=0)
             start_date_utc = cur_time.astimezone(pytz.utc)
             end_date_utc = start_date_utc + timedelta(hours=24)
@@ -45,6 +46,10 @@ class PowerData(Resource):
                 "$gte": start_date_utc,
                 "$lte": end_date_utc
             }
+            #func param
+            func = request.args.get('func')
+            if func is None or func == '0':
+                func = '30min'
 
             if resource_id == 1:
                 #Get Baseline
@@ -115,23 +120,69 @@ class PowerData(Resource):
 
             elif resource_id == 3:
                 # Get power
-                topic_path = '350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/AverageBuildingPower'
-                find_params = {
-                    #'topic_id': ObjectId('56de38d6c56e5232da276a54'),
-                    #'topic_id': ObjectId("56de38d6c56e5232da276a4f"),
+                #topic_path = '350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/AverageBuildingPower'
+                topic_id = ObjectId("5978c6c5c56e526f28984f13")
+                hourly = False
+                if func == '30min' or func == '30m':
                     # 350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/AverageBuildingPower
-                    'topic_id': ObjectId("5978c6c5c56e526f28984f13"),
+                    topic_id = ObjectId("5978c6c5c56e526f28984f13")
+                elif func == '60min' or func == '60m' or func == '1h' or func == '1hour' or func == 'hourly':
+                    # PNNL / 350_BUILDING / METERS / WholeBuildingPowerWithoutShopAirCompressor
+                    topic_id = ObjectId("56de38d6c56e5232da276a51"),
+                    hourly = True
+                elif func == 'exp' or func == 'exponential':
+                    #350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/LoadControlPower
+                    topic_id = ObjectId("5978c6c5c56e526f28984f15")
+
+                find_params = {
+                    # 350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/AverageBuildingPower
+                    #'topic_id': ObjectId("5978c6c5c56e526f28984f13"),
+                    # PNNL / 350_BUILDING / METERS / WholeBuildingPowerWithoutShopAirCompressor
+                    #'topic_id': ObjectId("56de38d6c56e5232da276a51"),
+                    # PNNL / 350_BUILDING / METERS / WholeBuildingPower
+                    #'topic_id': ObjectId("56de38d6c56e5232da276a54"),
+                    #'topic_id': ObjectId("5978c6c5c56e526f28984f15"),
+                    'topic_id': topic_id,
                     'ts': ts_filter
                 }
                 data_cur = self.mongodb["data"].find(find_params).batch_size(10000)
                 records = data_cur[:]
-                for record in records:
-                    ts = record['ts']
-                    ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
-                    ret_val.append({
-                        'ts': format_ts(ts),
-                        'value': record['value']
-                    })
+
+                if hourly:
+                    cur_hr = -1
+                    cur_hr_values = []
+                    for record in records:
+                        ts = record['ts']
+                        ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
+                        value = float(record['value'])
+                        ret_val.append({
+                            'ts': ts,
+                            'value': value
+                        })
+
+                    df = pd.DataFrame(ret_val)
+                    df.to_csv('a.csv')
+                    df = df.set_index(['ts'])
+                    df.to_csv('b.csv')
+                    #df = df.groupby([df.index.year, df.index.month, df.index.day, df.index.hour])['value'].mean()
+                    df = df.resample('1H', closed='right', label='left').mean()
+                    df.to_csv('c.csv')
+                    df = df.reset_index(level=['ts'])
+                    df.to_csv('d.csv')
+                    ret_val = df.T.to_dict().values()
+                    df.to_csv('e.csv')
+                    ret_val = [{
+                        'ts': format_ts(item['ts'] + timedelta(minutes=self.delta_in_min)),
+                        'value': item['value']} for item in ret_val]
+
+                else:
+                    for record in records:
+                        ts = record['ts']
+                        ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
+                        ret_val.append({
+                            'ts': format_ts(ts),
+                            'value': record['value']
+                        })
 
             if ret_val is not None:
                 ret_val = sorted(ret_val, key=lambda k: k['ts'])
