@@ -182,20 +182,14 @@ class PowerData(Resource):
                         })
 
                     df = pd.DataFrame(ret_val)
-                    df.to_csv('a.csv')
                     df = df.set_index(['ts'])
-                    df.to_csv('b.csv')
                     #df = df.groupby([df.index.year, df.index.month, df.index.day, df.index.hour])['value'].mean()
                     df = df.resample('1H', closed='right', label='left').mean()
-                    df.to_csv('c.csv')
                     df = df.reset_index(level=['ts'])
-                    df.to_csv('d.csv')
                     ret_val = df.T.to_dict().values()
-                    df.to_csv('e.csv')
                     ret_val = [{
                         'ts': format_ts(item['ts'] + timedelta(minutes=self.delta_in_min)),
                         'value': item['value']} for item in ret_val]
-
                 else:
                     for record in records:
                         ts = record['ts']
