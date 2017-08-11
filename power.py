@@ -29,13 +29,22 @@ class PowerData(Resource):
         self.local_tz = pytz.timezone('US/Pacific')
         self.delta_in_min = 60 #15
 
+        # Cooling
+        # Baseline date: 8 / 5 / 2016
+        # ILC date: 8 / 16 / 2016
+
+        # Heating
+        # Baseline date: 3 / 14 / 2016
+        # ILC date: 3 / 15 / 2016
+
+
     def get(self, resource_id):
         ret_val = []
 
         try:
             #date param
             cur_time = request.args.get('date')
-            if cur_time is None or cur_time == '0':
+            if cur_time is None or cur_time == '0' or cur_time == 'undefined':
                 cur_time = datetime.now(tz=self.local_tz)
             else:
                 cur_time = self.local_tz.localize(parser.parse(cur_time))
@@ -51,9 +60,18 @@ class PowerData(Resource):
             if func is None or func == '0':
                 func = '30min'
 
+            #season param
+            season = request.args.get('season')
+            if season == 'cooling' or season == 'Cooling':
+                season_base_date = '2016-08-05'
+                season_actual_date = '2016-08-16'
+            else:
+                season_base_date = '2016-03-14'
+                season_actual_date = '2016-03-15'
+
             if resource_id == 1:
                 #Get Baseline
-                topic_path = 'target_agent/PNNL/350_BUILDING/goal/value'
+                topic_path = 'PGnE/PNNL/350_BUILDING/baseline/value'
                 find_params = {
                     'topic_id': ObjectId('597b5e70c56e526f28984f69'),
                     'ts': ts_filter
@@ -133,6 +151,9 @@ class PowerData(Resource):
                 elif func == 'exp' or func == 'exponential':
                     #350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/LoadControlPower
                     topic_id = ObjectId("5978c6c5c56e526f28984f15")
+                elif func == 'realtime':
+                    # PNNL / 350_BUILDING / METERS / WholeBuildingPowerWithoutShopAirCompressor
+                    topic_id = ObjectId("56de38d6c56e5232da276a51")
 
                 find_params = {
                     # 350-BUILDING ILC/PNNL/350_BUILDING/AverageBuildingPower/AverageBuildingPower
@@ -183,6 +204,47 @@ class PowerData(Resource):
                             'ts': format_ts(ts),
                             'value': record['value']
                         })
+            elif resource_id == 4 or resource_id == 5:
+                # PNNL / 350_BUILDING / METERS / WholeBuildingPowerWithoutShopAirCompressor
+                topic_id = ObjectId("56de38d6c56e5232da276a51")
+                cur_time = season_base_date
+                if resource_id == 5:
+                    cur_time = season_actual_date
+
+                cur_time = self.local_tz.localize(parser.parse(cur_time))
+                cur_time = cur_time.replace(hour=0, minute=0, second=0, microsecond=0)
+                start_date_utc = cur_time.astimezone(pytz.utc) + timedelta(minutes=30)
+                end_date_utc = start_date_utc + timedelta(hours=24) + timedelta(minutes=30)
+                ts_filter = {
+                    "$gte": start_date_utc,
+                    "$lte": end_date_utc
+                }
+
+                find_params = {
+                    'topic_id': topic_id,
+                    'ts': ts_filter
+                }
+                data_cur = self.mongodb["data"].find(find_params).batch_size(10000)
+                records = data_cur[:]
+
+                for record in records:
+                    ts = record['ts']
+                    ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
+                    value = float(record['value'])
+                    ret_val.append({
+                        'ts': ts,
+                        'value': value
+                    })
+
+                df = pd.DataFrame(ret_val)
+                df = df.set_index(['ts'])
+                df['demand'] = df['value'].rolling(min_periods=30, window=30, center=False).mean()
+                df = df.dropna()
+                df = df.reset_index(level=['ts'])
+                ret_val = df.T.to_dict().values()
+                ret_val = [{
+                    'ts': format_ts(item['ts'].replace(year=2017, month=8, day=10)),
+                    'value': item['demand']} for item in ret_val]
 
             if ret_val is not None:
                 ret_val = sorted(ret_val, key=lambda k: k['ts'])
@@ -221,7 +283,7 @@ class ZoneData(Resource):
         try:
             topic = request.args.get('topic')
             cur_time = request.args.get('date')
-            if cur_time is None or cur_time == '0':
+            if cur_time is None or cur_time == '0' or cur_time == 'undefined':
                 cur_time = datetime.now(tz=self.local_tz)
             else:
                 cur_time = self.local_tz.localize(parser.parse(cur_time))

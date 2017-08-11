@@ -19,8 +19,9 @@ webpackEmptyContext.id = "../../../../../src async recursive";
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_app_app_component__ = __webpack_require__("../../../../../src/app/app.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_app_page_not_found_page_not_found_component__ = __webpack_require__("../../../../../src/app/page-not-found/page-not-found.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_app_page_not_found_page_not_found_component__ = __webpack_require__("../../../../../src/app/page-not-found/page-not-found.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_app_demo_demo_component__ = __webpack_require__("../../../../../src/app/demo/demo.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_app_ilc_ilc_component__ = __webpack_require__("../../../../../src/app/ilc/ilc.component.ts");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppRoutingModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -32,9 +33,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
+
 var appRoutes = [
-    { path: '', component: __WEBPACK_IMPORTED_MODULE_2_app_app_component__["a" /* AppComponent */] },
-    { path: '**', component: __WEBPACK_IMPORTED_MODULE_3_app_page_not_found_page_not_found_component__["a" /* PageNotFoundComponent */] }
+    { path: 'ilc', component: __WEBPACK_IMPORTED_MODULE_4_app_ilc_ilc_component__["a" /* IlcComponent */] },
+    { path: 'demo', component: __WEBPACK_IMPORTED_MODULE_3_app_demo_demo_component__["a" /* DemoComponent */] },
+    { path: '', redirectTo: '/ilc', pathMatch: 'full' },
+    { path: '**', component: __WEBPACK_IMPORTED_MODULE_2_app_page_not_found_page_not_found_component__["a" /* PageNotFoundComponent */] }
 ];
 var AppRoutingModule = (function () {
     function AppRoutingModule() {
@@ -78,7 +82,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/app.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!--The whole content below can be removed with the new code.-->\n<div style=\"text-align:center\">\n  <h1>\n    {{title1}}\n  </h1>\n  <h1 *ngIf=\"title2\">\n    {{title2}}\n  </h1> \n</div>\n<div>\n  <div *ngIf=\"ViewDate\"> \n    <app-power [viewDate]=\"ViewDate\" [func]=\"Func\" [secureToken]=\"SecureToken\">Loading...</app-power> \n    <app-zone-comfort [viewDate]=\"ViewDate\">Loading...</app-zone-comfort>\n  </div> \n</div>\n\n"
+module.exports = "<!--The whole content below can be removed with the new code.-->\n<div style=\"text-align:center\">\n  <h1>\n    {{title1}}\n  </h1>\n  <h1 *ngIf=\"title2\">\n    {{title2}}\n  </h1> \n</div>\n<router-outlet></router-outlet>\n<div>\n  <hr/>\n  <a routerLink=\"/ilc\" routerLinkActive=\"active\">ILC Realtime</a>\n  <hr/>\n  <a routerLink=\"/demo\" routerLinkActive=\"active\">Past Experiments</a>\n  <hr/>\n</div>\n"
 
 /***/ }),
 
@@ -88,9 +92,8 @@ module.exports = "<!--The whole content below can be removed with the new code.-
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__ = __webpack_require__("../../../../../src/app/services/authentication.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_switchMap__ = __webpack_require__("../../../../rxjs/add/operator/switchMap.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_switchMap___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_switchMap__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_switchMap__ = __webpack_require__("../../../../rxjs/add/operator/switchMap.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_switchMap___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_switchMap__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -98,70 +101,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
 
 
 
 var AppComponent = (function () {
-    function AppComponent(_authService, _route, _router) {
-        this._authService = _authService;
-        this._route = _route;
-        this._router = _router;
+    function AppComponent() {
         this.title1 = 'PNNL Building 350 - Transactive Control';
         this.title2 = 'Intelligent Load Control';
     }
-    AppComponent.prototype.ngOnInit = function () {
-        var _this = this;
-        this.sub = this._route
-            .queryParams
-            .skip(1)
-            .subscribe(function (params) {
-            // Defaults to 0 if no query param provided.
-            _this.ViewDate = params['date'] || '0';
-            _this.Func = params['func'] || '0';
-            console.log("Date1 is: " + _this.ViewDate);
-        });
-        //This is because the Observable is behavior object
-        //  1st subscribe always returns undefined -> thus, skip(1) above
-        //Give 300ms for all params are assigned (e.g., ViewDate) before checking ViewDate
-        setTimeout(function () {
-            if (!_this.ViewDate) {
-                _this.ViewDate = '0';
-            }
-            if (!_this.Func) {
-                _this.Func = '0';
-            }
-        }, 300);
-        //Get Secure Token
-        // this._authService.GetSecureToken()
-        //   .subscribe(
-        //     data => this.setSecureToken(data),
-        //     error => console.log("ERROR__:" + error),
-        //     () => console.log('Get Auth completed'));
-    };
-    AppComponent.prototype.setSecureToken = function (data) {
-        this.SecureToken = data['result'];
-        console.log(this.SecureToken);
-    };
-    AppComponent.prototype.ngOnDestroy = function () {
-        this.sub.unsubsribe();
-    };
     return AppComponent;
 }());
 AppComponent = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* Component */])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
         selector: 'app-root',
         template: __webpack_require__("../../../../../src/app/app.component.html"),
         styles: [__webpack_require__("../../../../../src/app/app.component.css")],
         providers: [__WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__["a" /* AuthenticationService */]]
-    }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__["a" /* AuthenticationService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__["a" /* AuthenticationService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */]) === "function" && _c || Object])
+    })
 ], AppComponent);
 
-var _a, _b, _c;
 //# sourceMappingURL=app.component.js.map
 
 /***/ }),
@@ -220,6 +178,9 @@ Configuration = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__app_constants__ = __webpack_require__("../../../../../src/app/app.constants.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__zone_comfort_zone_comfort_component__ = __webpack_require__("../../../../../src/app/zone-comfort/zone-comfort.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__page_not_found_page_not_found_component__ = __webpack_require__("../../../../../src/app/page-not-found/page-not-found.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__demo_demo_component__ = __webpack_require__("../../../../../src/app/demo/demo.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ilc_ilc_component__ = __webpack_require__("../../../../../src/app/ilc/ilc.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__fix_target_fix_target_component__ = __webpack_require__("../../../../../src/app/fix-target/fix-target.component.ts");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -227,6 +188,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
+
+
 
 
 
@@ -249,7 +213,10 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_5__plotly_plotly_component__["a" /* PlotlyComponent */],
             __WEBPACK_IMPORTED_MODULE_6__power_power_component__["a" /* PowerComponent */],
             __WEBPACK_IMPORTED_MODULE_8__zone_comfort_zone_comfort_component__["a" /* ZoneComfortComponent */],
-            __WEBPACK_IMPORTED_MODULE_9__page_not_found_page_not_found_component__["a" /* PageNotFoundComponent */]
+            __WEBPACK_IMPORTED_MODULE_9__page_not_found_page_not_found_component__["a" /* PageNotFoundComponent */],
+            __WEBPACK_IMPORTED_MODULE_10__demo_demo_component__["a" /* DemoComponent */],
+            __WEBPACK_IMPORTED_MODULE_11__ilc_ilc_component__["a" /* IlcComponent */],
+            __WEBPACK_IMPORTED_MODULE_12__fix_target_fix_target_component__["a" /* FixTargetComponent */]
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["a" /* BrowserModule */],
@@ -262,6 +229,435 @@ AppModule = __decorate([
 ], AppModule);
 
 //# sourceMappingURL=app.module.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/demo/demo.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/demo/demo.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<div>\n  <app-fix-target [id]=\"'coolingPlotId'\" [viewDate]=\"ViewDate\" [func]=\"Func\" [secureToken]=\"SecureToken\" [season]=\"'Cooling'\"></app-fix-target>\n  <div style=\"text-align:center\">\n    <h1>\n      {{title1}}\n    </h1>\n    <h1 *ngIf=\"title2\">\n      {{title2}}\n    </h1> \n  </div>\n  <app-fix-target [id]=\"'heatingPlotId'\" [viewDate]=\"ViewDate\" [func]=\"Func\" [secureToken]=\"SecureToken\" [season]=\"'Heating'\"></app-fix-target>\n</div>"
+
+/***/ }),
+
+/***/ "../../../../../src/app/demo/demo.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_observable_interval__ = __webpack_require__("../../../../rxjs/add/observable/interval.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_observable_interval___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rxjs_add_observable_interval__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__("../../../../rxjs/add/operator/map.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_take__ = __webpack_require__("../../../../rxjs/add/operator/take.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_take___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_take__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_takeWhile__ = __webpack_require__("../../../../rxjs/add/operator/takeWhile.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_takeWhile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_takeWhile__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_authentication_service__ = __webpack_require__("../../../../../src/app/services/authentication.service.ts");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return DemoComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+var DemoComponent = (function () {
+    function DemoComponent(_authService) {
+        this._authService = _authService;
+        this.title1 = 'PNNL Building 350 - Transactive Control';
+        this.title2 = 'Intelligent Load Control';
+    }
+    DemoComponent.prototype.ngOnInit = function () {
+    };
+    DemoComponent.prototype.ngOnDestroy = function () {
+    };
+    return DemoComponent;
+}());
+DemoComponent = __decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
+        selector: 'app-demo',
+        template: __webpack_require__("../../../../../src/app/demo/demo.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/demo/demo.component.css")],
+        providers: [__WEBPACK_IMPORTED_MODULE_5__services_authentication_service__["a" /* AuthenticationService */]]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_5__services_authentication_service__["a" /* AuthenticationService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__services_authentication_service__["a" /* AuthenticationService */]) === "function" && _a || Object])
+], DemoComponent);
+
+var _a;
+//# sourceMappingURL=demo.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/fix-target/fix-target.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/fix-target/fix-target.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<div *ngIf=\"PlotlyData\">\n    <plotlychart #fixTargetChart\n      [plotId]=\"PlotlyId\"\n      [data]=\"PlotlyData\"  \n      [layout]=\"PlotlyLayout\" \n      [options]=\"PlotlyOptions\" \n      [displayRawData]=\"DisplayData\"\n      (replaying)=\"isReplaying($event)\">\n    </plotlychart>\n  </div>\n  "
+
+/***/ }),
+
+/***/ "../../../../../src/app/fix-target/fix-target.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__ = __webpack_require__("../../../../rxjs/Rx.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_observable_interval__ = __webpack_require__("../../../../rxjs/add/observable/interval.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_observable_interval___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_observable_interval__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__ = __webpack_require__("../../../../rxjs/add/operator/map.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_take__ = __webpack_require__("../../../../rxjs/add/operator/take.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_take___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_take__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_takeWhile__ = __webpack_require__("../../../../rxjs/add/operator/takeWhile.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_takeWhile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_takeWhile__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_power_data_service__ = __webpack_require__("../../../../../src/app/services/power-data.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__ = __webpack_require__("../../../../../src/app/services/authentication.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__ = __webpack_require__("../../../../../src/app/plotly/plotly.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment__ = __webpack_require__("../../../../moment/moment.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_moment__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return FixTargetComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+//import {Observable} from 'rxjs/Observable';
+
+
+
+
+
+
+
+
+
+var FixTargetComponent = (function () {
+    function FixTargetComponent(_powerDataService, _authService) {
+        this._powerDataService = _powerDataService;
+        this._authService = _authService;
+        this.DisplayData = false;
+        this.Replaying = false;
+        this.alive = true;
+        this.interval = 1000;
+        this.timer = __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__["Observable"].timer(this.interval, this.interval);
+    }
+    FixTargetComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.PlotlyId = this.id;
+        this.PlotlyLayout = {
+            title: "",
+            height: 600,
+            width: 1420,
+            margin: {
+                l: 80,
+                r: 50,
+                b: 50,
+                t: 50,
+                pad: 4
+            },
+            xaxis: {
+                title: '<b>Time</b>',
+                tickformat: "%-I %p",
+                nticks: 30,
+                titlefont: {
+                    size: 16
+                },
+                tickfont: {
+                    size: 14
+                }
+            },
+            yaxis: {
+                title: '<b>Whole Building Electricity Consumption (kWh)</b>',
+                range: [0, 200],
+                zerolinewidth: 3,
+                titlefont: {
+                    size: 16
+                },
+                tickfont: {
+                    size: 14
+                }
+            },
+            legend: {
+                x: 0.84,
+                y: 1,
+                font: {
+                    size: 14
+                }
+            }
+        };
+        var baselineTrace = {
+            name: 'Baseline',
+            x: [],
+            y: [],
+            mode: 'lines',
+            'line': {
+                width: 3
+            }
+        };
+        var targetTrace = {
+            name: 'Target',
+            x: [],
+            y: [147, 147],
+            mode: 'lines',
+            'line': {
+                width: 3
+            }
+        };
+        var powerTrace = {
+            name: 'Actual',
+            x: [],
+            y: [],
+            mode: 'lines',
+            'line': {
+                width: 3
+            }
+        };
+        this.PlotlyData = [baselineTrace, targetTrace, powerTrace];
+        //Initial get
+        this._powerDataService.GetAllPowerWithoutILC(this.viewDate, this.func, this.season)
+            .takeWhile(function () { return _this.alive; })
+            .subscribe(function (data) { return _this.setNewData(data, 0); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPowerWithoutILC completed.'); });
+        this._powerDataService.GetAllPowerWithILC(this.viewDate, this.func, this.season)
+            .takeWhile(function () { return _this.alive; })
+            .subscribe(function (data) { return _this.setNewData(data, 2); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPowerWithILC completed.'); });
+    };
+    FixTargetComponent.prototype.setNewData = function (data, traceIdx) {
+        // Output format:
+        // Plotly.extendTraces('myDiv', {
+        //   x: [[rand()], [rand()], [rand()]],
+        //   y: [[rand()], [rand()], [rand()]]
+        // }, [0, 1, 2])
+        if (data == null || data['result'])
+            return;
+        //Refort data to Plotly format
+        var newPlotlyData = { x: [[], [], []], y: [[], [], []] };
+        //for (let d of data['result']) {
+        //Angular is different from JS. The getTime() in JS return UTC while getTime in Angular returns Local
+        //let curDateTime = (new Date).getTime();
+        var curDateTime = new Date;
+        for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+            var d = data_1[_i];
+            if (traceIdx != 1) {
+                newPlotlyData['x'][traceIdx].push(d['ts']);
+                newPlotlyData['y'][traceIdx].push(d['value']);
+                if (traceIdx == 0) {
+                    //x: ['2017-08-10T00:00:00.000000Z','2017-08-11T00:00:00.000000Z'],
+                    newPlotlyData['x'][1].push(d['ts']);
+                    newPlotlyData['y'][1].push(147);
+                }
+            }
+            else {
+                //Moment parse non-offset string to UTC by default. Set format to parse to local.
+                var myMoment = __WEBPACK_IMPORTED_MODULE_9_moment__(d['ts'], 'YYYY-MM-DDTHH:mm:ss[Z]');
+                if (myMoment.isBefore(curDateTime)) {
+                    newPlotlyData['x'][traceIdx].push(d['ts']);
+                    newPlotlyData['y'][traceIdx].push(d['value']);
+                }
+            }
+        }
+        this.targetChart.ExtendTraces(newPlotlyData, [0, 1, 2]);
+    };
+    FixTargetComponent.prototype.isReplaying = function (replaying) {
+        this.Replaying = replaying;
+    };
+    FixTargetComponent.prototype.ngOnDestroy = function () {
+        this.alive = false;
+    };
+    return FixTargetComponent;
+}());
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", Object)
+], FixTargetComponent.prototype, "secureToken", void 0);
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", String)
+], FixTargetComponent.prototype, "viewDate", void 0);
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", String)
+], FixTargetComponent.prototype, "func", void 0);
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", String)
+], FixTargetComponent.prototype, "season", void 0);
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Input */])(),
+    __metadata("design:type", String)
+], FixTargetComponent.prototype, "id", void 0);
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* ViewChild */])('fixTargetChart'),
+    __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
+], FixTargetComponent.prototype, "targetChart", void 0);
+FixTargetComponent = __decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
+        selector: 'app-fix-target',
+        template: __webpack_require__("../../../../../src/app/fix-target/fix-target.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/fix-target/fix-target.component.css")],
+        providers: [__WEBPACK_IMPORTED_MODULE_6__services_power_data_service__["a" /* PowerDataService */], __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__["a" /* AuthenticationService */]]
+    }),
+    __metadata("design:paramtypes", [typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_6__services_power_data_service__["a" /* PowerDataService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__services_power_data_service__["a" /* PowerDataService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__["a" /* AuthenticationService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__["a" /* AuthenticationService */]) === "function" && _c || Object])
+], FixTargetComponent);
+
+var _a, _b, _c;
+//# sourceMappingURL=fix-target.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/ilc/ilc.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/ilc/ilc.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<div *ngIf=\"ViewDate\"> \n  <app-power [viewDate]=\"ViewDate\" [func]=\"Func\" [secureToken]=\"SecureToken\">Loading...</app-power> \n  <app-zone-comfort [viewDate]=\"ViewDate\">Loading...</app-zone-comfort>\n</div> "
+
+/***/ }),
+
+/***/ "../../../../../src/app/ilc/ilc.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__ = __webpack_require__("../../../../../src/app/services/authentication.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_switchMap__ = __webpack_require__("../../../../rxjs/add/operator/switchMap.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_switchMap___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_switchMap__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return IlcComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var IlcComponent = (function () {
+    function IlcComponent(_authService, _route, _router) {
+        this._authService = _authService;
+        this._route = _route;
+        this._router = _router;
+    }
+    IlcComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.sub = this._route
+            .queryParams
+            .subscribe(function (params) {
+            // Defaults to 0 if no query param provided.
+            _this.ViewDate = params['date'] || '0';
+            _this.Func = params['func'] || '0';
+            console.log("Date1 is: " + _this.ViewDate);
+        });
+        //This is because the Observable is behavior object
+        //  1st subscribe always returns undefined -> thus, skip(1) above
+        //Give 300ms for all params are assigned (e.g., ViewDate) before checking ViewDate
+        //Seems like this happens only if the component is embedded at the app level
+        // setTimeout(() => {
+        //   if (!this.ViewDate) {
+        //     this.ViewDate = '0';  
+        //   }
+        //   if (!this.Func) {
+        //     this.Func = '0';  
+        //   }
+        // }, 300);
+        //Get Secure Token
+        // this._authService.GetSecureToken()
+        //   .subscribe(
+        //     data => this.setSecureToken(data),
+        //     error => console.log("ERROR__:" + error),
+        //     () => console.log('Get Auth completed'));
+    };
+    IlcComponent.prototype.setSecureToken = function (data) {
+        this.SecureToken = data['result'];
+        console.log(this.SecureToken);
+    };
+    IlcComponent.prototype.ngOnDestroy = function () {
+        console.log(this.sub);
+        this.sub.unsubscribe();
+    };
+    return IlcComponent;
+}());
+IlcComponent = __decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
+        selector: 'app-ilc',
+        template: __webpack_require__("../../../../../src/app/ilc/ilc.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/ilc/ilc.component.css")],
+        providers: [__WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__["a" /* AuthenticationService */]]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__["a" /* AuthenticationService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_app_services_authentication_service__["a" /* AuthenticationService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */]) === "function" && _c || Object])
+], IlcComponent);
+
+var _a, _b, _c;
+//# sourceMappingURL=ilc.component.js.map
 
 /***/ }),
 
@@ -312,7 +708,7 @@ var PageNotFoundComponent = (function () {
     return PageNotFoundComponent;
 }());
 PageNotFoundComponent = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* Component */])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
         //template: '<h2>Page not found</h2>'
         selector: 'app-page-not-found',
         template: __webpack_require__("../../../../../src/app/page-not-found/page-not-found.component.html"),
@@ -446,7 +842,7 @@ var PlotlyComponent = (function () {
             Plotly.extendTraces(_this.plotId, nextData, traceArr);
             //ExtendTraces(newPlotlyData, [0,1,2]);
             pointIdx++;
-        }, 10);
+        }, 1);
     };
     //Deep cloning an array
     PlotlyComponent.prototype.duplicateArray = function (sourceArr) {
@@ -483,7 +879,7 @@ __decorate([
     __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["s" /* EventEmitter */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["s" /* EventEmitter */]) === "function" && _a || Object)
 ], PlotlyComponent.prototype, "replaying", void 0);
 PlotlyComponent = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* Component */])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
         selector: 'plotlychart',
         template: __webpack_require__("../../../../../src/app/plotly/plotly.component.html"),
         styles: [__webpack_require__("../../../../../src/app/plotly/plotly.component.css")]
@@ -806,11 +1202,11 @@ __decorate([
     __metadata("design:type", String)
 ], PowerComponent.prototype, "func", void 0);
 __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* ViewChild */])('targetChart'),
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* ViewChild */])('targetChart'),
     __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
 ], PowerComponent.prototype, "targetChart", void 0);
 PowerComponent = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* Component */])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
         selector: 'app-power',
         template: __webpack_require__("../../../../../src/app/power/power.component.html"),
         styles: [__webpack_require__("../../../../../src/app/power/power.component.css")],
@@ -947,6 +1343,8 @@ var PowerDataService = (function () {
         this.allBaselineEndPoint = '1';
         this.allTargetEndPoint = '2';
         this.allPowerEndPoint = '3';
+        this.allPowerWithoutILCEndPoint = '4';
+        this.allPowerWithILCEndPoint = '5';
         this.GetAllBaselineVC = function (secureToken) {
             var postBody = {
                 jsonrpc: '2.0',
@@ -979,6 +1377,14 @@ var PowerDataService = (function () {
         this.GetAllPower = function (viewDate, func) {
             console.log('Get GetAllPower starting...');
             return _this._http.get(_this.actionUrl + "/" + _this.allPowerEndPoint + "?date=" + viewDate + "&func=" + func, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
+        };
+        this.GetAllPowerWithILC = function (viewDate, func, season) {
+            console.log('Get GetAllPowerWithILC starting...');
+            return _this._http.get(_this.actionUrl + "/" + _this.allPowerWithILCEndPoint + "?season=" + season, {}).timeout(3000000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
+        };
+        this.GetAllPowerWithoutILC = function (viewDate, func, season) {
+            console.log('Get GetAllPowerWithoutILC starting...');
+            return _this._http.get(_this.actionUrl + "/" + _this.allPowerWithoutILCEndPoint + "?season=" + season, {}).timeout(3000000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
         };
         this.actionUrl = "" + _configuration.GetServer() + this.serviceName;
         this.headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
@@ -1266,11 +1672,11 @@ __decorate([
     __metadata("design:type", String)
 ], ZoneComfortComponent.prototype, "viewDate", void 0);
 __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* ViewChild */])('zoneChart'),
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* ViewChild */])('zoneChart'),
     __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_3_app_plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_app_plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
 ], ZoneComfortComponent.prototype, "zoneChart", void 0);
 ZoneComfortComponent = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* Component */])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
         selector: 'app-zone-comfort',
         template: __webpack_require__("../../../../../src/app/zone-comfort/zone-comfort.component.html"),
         styles: [__webpack_require__("../../../../../src/app/zone-comfort/zone-comfort.component.css")],
