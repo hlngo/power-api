@@ -427,7 +427,7 @@ var FixTargetComponent = (function () {
                 }
             },
             legend: {
-                x: 0.84,
+                x: 0.9,
                 y: 1,
                 font: {
                     size: 14
@@ -435,7 +435,7 @@ var FixTargetComponent = (function () {
             }
         };
         var baselineTrace = {
-            name: 'Baseline',
+            name: 'Expected',
             x: [],
             y: [],
             mode: 'lines',
@@ -1098,7 +1098,7 @@ var PowerComponent = (function () {
             }
         };
         var baselineTrace = {
-            name: 'Baseline',
+            name: 'Expected',
             x: [],
             y: [],
             mode: 'lines+markers',
