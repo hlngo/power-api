@@ -1090,7 +1090,7 @@ var PowerComponent = (function () {
                 }
             },
             legend: {
-                x: 0.84,
+                x: 0.93,
                 y: 1,
                 font: {
                     size: 14
@@ -1107,7 +1107,7 @@ var PowerComponent = (function () {
             }
         };
         var targetTrace = {
-            name: 'Price-Responsive Target',
+            name: 'Target',
             x: [],
             y: [],
             mode: 'lines+markers',
