@@ -1,20 +1,17 @@
-from flask import Flask, request, current_app
-from flask_restful import Resource, Api
-from flask_restful.utils import cors
+from flask import request
+from flask_restful import Resource
 
 import json
+import pytz
+import traceback
+import pandas as pd
+from datetime import datetime, timedelta
+from dateutil import parser
+
 import pymongo
 from bson.objectid import ObjectId
 
-from datetime import datetime, timedelta
-import pytz
-import dateutil.tz
-from dateutil import parser
-import traceback
-import pandas as pd
-
-app = Flask(__name__)
-api = Api(app, decorators=[cors.crossdomain(origin='*')])
+from utils import format_ts
 
 
 class PowerData(Resource):
@@ -36,7 +33,6 @@ class PowerData(Resource):
         # Heating
         # Baseline date: 3 / 14 / 2016
         # ILC date: 3 / 15 / 2016
-
 
     def get(self, resource_id):
         ret_val = []
@@ -259,104 +255,3 @@ class PowerData(Resource):
 
         return ret_val
 
-
-class ZoneData(Resource):
-    def __init__(self):
-        self.batch_size = 10000
-        params = {'hostsandports': 'vc-db.pnl.gov', 'user': 'reader',
-                  'passwd': 'volttronReader', 'database': 'prod_historian'}
-        mongo_uri = "mongodb://{user}:{passwd}@{hostsandports}/{database}"
-        mongo_uri = mongo_uri.format(**params)
-        mongoclient = pymongo.MongoClient(mongo_uri, connect=False)
-        self.mongodb = mongoclient.get_default_database()
-
-        self.local_tz = pytz.timezone('US/Pacific')
-
-    def get(self):
-        ret_val = []
-        try:
-            topic = request.args.get('topic')
-            cur_time = request.args.get('date')
-            if cur_time is None or cur_time == '0' or cur_time == 'undefined':
-                cur_time = datetime.now(tz=self.local_tz)
-            else:
-                cur_time = self.local_tz.localize(parser.parse(cur_time))
-
-            cur_time = cur_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            start_date_utc = cur_time.astimezone(pytz.utc)
-            end_date_utc = start_date_utc + timedelta(hours=24)
-            ts_filter = {
-                "$gte": start_date_utc,
-                "$lte": end_date_utc
-            }
-
-            parts = topic.split(',')
-            topic = '/'.join(parts)
-            find_params = {
-                'topic_name': topic
-            }
-            data_cur = self.mongodb["topics"].find(find_params)
-            records = data_cur[:]
-
-            topic_id = None
-            for record in records:
-                topic_id = record['_id']
-
-            if topic_id is None:
-                return ret_val
-
-            find_params = {
-                'topic_id': topic_id,
-                'ts': ts_filter
-            }
-
-            data_cur = self.mongodb["data"].find(find_params).batch_size(self.batch_size)
-            records = data_cur[:]
-
-            for record in records:
-                ts = record['ts']
-                ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
-                ret_val.append({
-                    'ts': format_ts(ts),
-                    'value': record['value']
-                })
-
-            if ret_val is not None:
-                ret_val = sorted(ret_val, key=lambda k: k['ts'])
-        except:
-            return ret_val
-
-        return ret_val
-
-
-class ZoneDataByDate(Resource):
-    def __init__(self):
-        self.batch_size = 10000
-        params = {'hostsandports': 'vc-db.pnl.gov', 'user': 'reader',
-                  'passwd': 'volttronReader', 'database': 'prod_historian'}
-        mongo_uri = "mongodb://{user}:{passwd}@{hostsandports}/{database}"
-        mongo_uri = mongo_uri.format(**params)
-        mongoclient = pymongo.MongoClient(mongo_uri, connect=False)
-        self.mongodb = mongoclient.get_default_database()
-
-        self.local_tz = pytz.timezone('US/Pacific')
-
-    def get(self, date):
-        pass
-
-
-class Root(Resource):
-    def get(self):
-        return current_app.send_static_file('index.html')
-
-api.add_resource(PowerData, '/api/PowerData/<int:resource_id>')
-#api.add_resource(ZoneDataByDate, '/api/ZoneData/<string:date>')
-api.add_resource(ZoneData, '/api/ZoneData')
-api.add_resource(Root, '/api/')
-
-def format_ts(ts):
-    return ts.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
