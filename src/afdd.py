@@ -180,36 +180,36 @@ class Afdd(Resource):
                     for value in values:
                         # high fault-ok
                         code = round(float(value['high']), 1)
-                        is_fault_code = self.is_fault(code)
-                        if is_fault_code:
+                        postfix = self.get_fault_postfix(code)
+                        if postfix == 1:
                             high_fault += 1
                             if code_high_fault == -9999:
                                 code_high_fault = code
-                        else:
+                        elif postfix == 0:
                             high_ok += 1
                             if code_high_ok == -9999:
                                 code_high_ok = code
 
                         # normal fault-ok
                         code = round(float(value['normal']), 1)
-                        is_fault_code = self.is_fault(code)
-                        if is_fault_code:
+                        is_fault_code = self.get_fault_postfix(code)
+                        if postfix == 1:
                             normal_fault += 1
                             if code_normal_fault == -9999:
                                 code_normal_fault = code
-                        else:
+                        elif postfix == 0:
                             normal_ok += 1
                             if code_normal_ok == -9999:
                                 code_normal_ok = code
 
                         # low fault-ok
                         code = round(float(value['low']), 1)
-                        is_fault_code = self.is_fault(code)
-                        if is_fault_code:
+                        is_fault_code = self.get_fault_postfix(code)
+                        if postfix == 1:
                             low_fault += 1
                             if code_low_fault == -9999:
                                 code_low_fault = code
-                        else:
+                        elif postfix == 0:
                             low_ok += 1
                             if code_low_ok == -9999:
                                 code_low_ok = code
@@ -276,20 +276,17 @@ class Afdd(Resource):
 
         return out_code
 
-    def is_fault(self, code):
+    def get_fault_postfix(self, code):
         # Round to tenths place.
         # Note: A decimal value of .1 indicates a RED color [fault]
         # Note: A decimal value of .2 indicates a GREY color [inconclusive] - except where noted above
         # Note: A decimal value of .0 indicates a GREEN color [no problems]
         # Note: A decimal value of .3 indicates a White color [no problems]
-        is_fault = True
-        state = (code * 10) % 10
-        if code >= 0 and state == 1:  # RED
-            is_fault = True
-        elif code >= 0 and state == 0:  # GREEN
-            is_fault = False
+        post_fix = -9999
+        if code < 0:
+            code *= -1.0
 
-        return is_fault
+        return (code * 10) % 10
 
     def get_bin(self, bins, topic_id, ts):
         for bin in bins:

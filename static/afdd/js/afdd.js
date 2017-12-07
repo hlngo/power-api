@@ -504,7 +504,7 @@ $(function() {
                 string: "RED"
             },
             "WHITE": {
-                value: "Normal",
+                value: "Unit is Off",
                 color: "#FFFFFF",
                 state_value: 3,
                 string: "WHITE"
