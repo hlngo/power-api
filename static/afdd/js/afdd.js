@@ -50,7 +50,8 @@ $(function() {
     ];
     var error_messages = {};
     error_messages [econ_rcx] = {
-        "-1.0": "No Diagnosis",
+        "-1.2": "Not enough data for aggregation.",
+        "-1.0": "No Diagnosis.",
         "-99.3": "Supply fan of the air-handling/rooftop unit is off; therefore, potential faults with the unit cannot be detected at this time.",
         "-89.2": "The outdoor-air and return-air temperatures are too close; therefore, a conclusive diagnostic result is not possible.",
         "-79.2": "The outdoor-air temperature value is outside the normal limits.",
@@ -85,6 +86,7 @@ $(function() {
         "44.2": "Inconsistent or missing data; therefore, potential opportunity for operational improvements cannot be detected at this time."
     };
     error_messages[air_rcx] = {
+        "-1.2": "Not enough data for aggregation.",
         "-1.0": "No Diagnosis",
         "-99.3": "The air-handling unit’s supply fan is off; therefore, potential faults for this unit cannot be detected at this time.",
         "-89.2": "Inconsistent or missing data; therefore, potential opportunity for operational improvements cannot be detected at this time.",
@@ -506,7 +508,7 @@ $(function() {
                 color: "#FFFFFF",
                 state_value: 3,
                 string: "WHITE"
-            },
+            }
         };
         var yCategories = diagnosticList2;
         //var y2Categories = diagnosticList2;
@@ -633,6 +635,7 @@ $(function() {
             }
         }
 
+        //Draw legend
         var litem = legend_svg.selectAll("g")
                 .data(arrLegends)
                 .enter()
@@ -721,6 +724,7 @@ $(function() {
                 return yScale(yCategories[d.y]);
             })
             .attr("r", radius)
+            .attr("stroke", "grey")
             .attr("fill", function(d) {
                 return legends[d.state].color;
             })
@@ -778,6 +782,7 @@ $(function() {
                 .attr("y", 0)
                 .attr("width", rectWidth)
                 .attr("height", rectWidth)
+                .attr("stroke", "grey")
                 .attr("fill", function(d) {
                     return legends[d.state].color;
                 })
@@ -967,7 +972,7 @@ $(function() {
                         $.each(data['result']['values'], function (key, value) {
                             preCacheData[key] = value;
                             //console.log(key);
-                            //console.log(JSON.stringify(value));
+                            console.log(JSON.stringify(value));
                         });
                     }
                 },
@@ -1111,7 +1116,7 @@ $(function() {
                     $.each(data['result'], function (key, value) {
                         if (value.startsWith(econ_rcx_prefix)
                             || value.startsWith(air_rcx_prefix)) {
-                            console.log(value);
+                            //console.log(value);
                             var start_idx = 0;
                             if (prefix != '') {
                                 start_idx = 1;

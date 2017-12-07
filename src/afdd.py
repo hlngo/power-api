@@ -50,7 +50,7 @@ class Afdd(Resource):
 
         if len(self.topics.keys()) == 0 \
             or self.topics_pull_time is None \
-                or self.topics_pull_time + timedelta.min(update_topic_freq) < datetime.utcnow():
+                or self.topics_pull_time + timedelta(minutes=update_topic_freq) < datetime.utcnow():
             regx = re.compile('^' + prefix + '.*AIRCx')
             data_cur = self.mongodb["topics"].find({"topic_name": regx})
             records = data_cur[:]
@@ -164,6 +164,8 @@ class Afdd(Resource):
             bin = self.get_bin(bins, topic_id, ts)
             if bin is None:
                 raise 'Cannot find bin ' + topic_id
+            # if topic_id == ObjectId("59b2f6efc56e526d3856d5ca"):
+            #     x = 1
             bin['values'].append(values)
 
         # Aggregation values in each bin
@@ -173,17 +175,49 @@ class Afdd(Resource):
                 if len(values) > 0:
                     high_fault, low_fault, normal_fault = 0, 0, 0
                     high_ok, low_ok, normal_ok = 0, 0, 0
+                    code_high_fault, code_low_fault, code_normal_fault = -9999, -9999, -9999
+                    code_high_ok, code_low_ok, code_normal_ok = -9999, -9999, -9999
                     for value in values:
+                        # high fault-ok
                         code = round(float(value['high']), 1)
-                        high_fault, high_ok = self.is_fault(code, high_fault, high_ok)
+                        is_fault_code = self.is_fault(code)
+                        if is_fault_code:
+                            high_fault += 1
+                            if code_high_fault == -9999:
+                                code_high_fault = code
+                        else:
+                            high_ok += 1
+                            if code_high_ok == -9999:
+                                code_high_ok = code
+
+                        # normal fault-ok
                         code = round(float(value['normal']), 1)
-                        normal_fault, normal_ok = self.is_fault(code, normal_fault, normal_ok)
+                        is_fault_code = self.is_fault(code)
+                        if is_fault_code:
+                            normal_fault += 1
+                            if code_normal_fault == -9999:
+                                code_normal_fault = code
+                        else:
+                            normal_ok += 1
+                            if code_normal_ok == -9999:
+                                code_normal_ok = code
+
+                        # low fault-ok
                         code = round(float(value['low']), 1)
-                        low_fault, low_ok = self.is_fault(code, low_fault, low_ok)
+                        is_fault_code = self.is_fault(code)
+                        if is_fault_code:
+                            low_fault += 1
+                            if code_low_fault == -9999:
+                                code_low_fault = code
+                        else:
+                            low_ok += 1
+                            if code_low_ok == -9999:
+                                code_low_ok = code
+
                     # Aggregate this bin
-                    bin['high'] = self.aggregate(high_fault, high_ok)
-                    bin['normal'] = self.aggregate(high_fault, high_ok)
-                    bin['low'] = self.aggregate(high_fault, high_ok)
+                    bin['high'] = self.aggregate(high_fault, high_ok, code_high_fault, code_high_ok)
+                    bin['normal'] = self.aggregate(normal_fault, normal_ok, code_normal_fault, code_normal_ok)
+                    bin['low'] = self.aggregate(low_fault, low_ok, code_low_fault, code_low_ok)
                 else: # no value => dx message = 0
                     pass
             else:  # energy impact
@@ -210,11 +244,12 @@ class Afdd(Resource):
         # Merge energy impact bin with dx message bin
 
 
-    def aggregate(self, num_fault, num_no_fault, min_n=3):
-        RED = 0.1
-        GREEN = 0.0
-        GREY = 3.2
+    def aggregate(self, num_fault, num_no_fault, code_fault, code_ok, min_n=3):
+        RED = code_fault
+        GREEN = code_ok
+        GREY = -1.2
         out_code = GREY
+
         p = 0.5
         conf = 0.95
         min_num_points = 5
@@ -241,19 +276,20 @@ class Afdd(Resource):
 
         return out_code
 
-    def is_fault(self, code, fault, ok):
+    def is_fault(self, code):
         # Round to tenths place.
         # Note: A decimal value of .1 indicates a RED color [fault]
         # Note: A decimal value of .2 indicates a GREY color [inconclusive] - except where noted above
-        # Note: A decimal value of .0 idicates a GREEN color [no problems]
-        # Note: A decimal value of .3 idicates a White color [no problems]
+        # Note: A decimal value of .0 indicates a GREEN color [no problems]
+        # Note: A decimal value of .3 indicates a White color [no problems]
+        is_fault = True
         state = (code * 10) % 10
         if code >= 0 and state == 1:  # RED
-            fault += 1
+            is_fault = True
         elif code >= 0 and state == 0:  # GREEN
-            ok += 1
+            is_fault = False
 
-        return fault, ok
+        return is_fault
 
     def get_bin(self, bins, topic_id, ts):
         for bin in bins:
@@ -311,7 +347,7 @@ class Afdd(Resource):
 
 if __name__ == '__main__':
     afdd = Afdd()
-    topics = afdd.get_topics()
+    topics = afdd.query_topics()
     print(topics)
     econ = afdd.get(1)
     print(econ)
