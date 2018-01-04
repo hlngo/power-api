@@ -532,20 +532,6 @@ $(function() {
 //            }
         });
 
-        var aggrDays = $("#aggregation").val();
-        var start_time = null;
-        var end_time = null;
-        if ($("#start-date").datepicker("getDate") != null) {
-            start_time = $("#start-date").datepicker("getDate").getTime();
-            start_time = new Date(start_time);
-        }
-        if ($("#end-date").datepicker("getDate") != null) {
-            end_time = $("#end-date").datepicker("getDate").getTime();
-            end_time = new Date(end_time);
-        }
-        //var groups = makeGroupByDate(data, start_time, end_time, parseInt(aggrDays), diagnosticList);
-
-
         var sample_data = afddAggregateData(data, legends, diagnosticList);
         var xDomain = d3.extent(sample_data, function(d) { return d.date; });
         var items_per_dayCol = yAxisLabels.length;
@@ -732,117 +718,116 @@ $(function() {
             })
             .attr("opacity", 1)
             .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
-            // Show hourly result
-//             .on('mousedown', function(d) {
-//                 d3.select("#hrData").remove();
-//                 if (d.diagnostic === "No Supply-air Temperature Reset Dx" ||
-//                     d.diagnostic === "No Static Pressure Reset Dx" ||
-//                     (d.diagnostic === "Operational Schedule Dx"
-//                         && d.diagnostic_message === "Supply fan is operating excessively during unoccupied times.") ||
-//                     d.diagnostic === "") {
-//                     return;
-//                 }
-//                 //DetailedArea has 3 <g> elements: border, label, hrDataArea (actual drawing)
-//                 var rectWidth = 24;
-//                 var yDomainData = makeArray(1,24);
-//                 var hrScale = d3.scale.ordinal()
-//                         .domain(yDomainData)
-//                         .rangeRoundBands([0, 24*rectWidth]);
-//                 var hrAxis = d3.svg.axis()
-//                         .scale(hrScale)
-//                         .orient("bottom");
-//                 var drawPosition = margin.left + 25;
-//
-//                 var hrDataArea = svg
-//                     .append("g")
-//                     .attr("id", "hrData")
-//                     .attr("width", 24*rectWidth)
-//                     .attr("height", rectWidth)
-//                     .attr("transform", "translate(0," + (height+100) + ")");
-//
-//                 hrDataArea.append("g")
-//                     .attr("class", "x axis")
-//                     .attr("transform", "translate(" + drawPosition + ","+ (rectWidth) +")")
-//                     .call(hrAxis);
-//
-//                 var hrLabelArea = hrDataArea.append("g")
-//                     .attr("class", "axis");
-//                 hrLabelArea.append("text")
-//                     .attr("x", 80)
-//                     .attr("y", rectWidth-7)
-//                     .text(diagnosticList[d.y]);
-//                 hrLabelArea.append("text")
-//                     .attr("x", 80)
-//                     .attr("y", rectWidth+20)
-//                     .text('(' + formatFullDate(d.date) + ')');
-//
-//                 hrDataArea.selectAll("rect")
-//                 .data(d.hourly_result)
-//                 .enter()
-//                 .append("rect")
-//                 .attr("x", function (d) {
-//                     return d.y*rectWidth + drawPosition;
-//                 })
-//                 .attr("y", 0)
-//                 .attr("width", rectWidth)
-//                 .attr("height", rectWidth)
-//                 .attr("stroke", "grey")
-//                 .attr("fill", function(d) {
-//                     return legends[d.state].color;
-//                 })
-//                 .attr("opacity", 1)
-//                 .style({"stroke-width": 1, "stroke": "black"})
-//                 .on('mouseover', hrTip.show)
-//                 .on('mouseout', hrTip.hide);
-//
-// //                var plot_width =
-// //                hrDataArea
-// //                    .append("g")
-// //                    .attr("class", "hour-data-border")
-// //                    .attr("width", containerWidth)
-// //                    .attr("height", rectWidth + 50)
-// //                    .attr("transform", "translate(0," + (-14) + ")")
-// //                    .append("rect")
-// //                    .attr("width", containerWidth)
-// //                    .attr("height", rectWidth + 50)
-// //                    .attr("x", 2)
-// //                    .attr("y", 0)
-// //                    .attr("fill", "transparent")
-// //                    .style({"stroke-width": 1, "stroke": "grey"});
-//
-//                 var borderWidth = 2;
-//                 var target = d3.event.target || d3.event.srcElement;
-//                 var pos = d3.mouse(this);
-//                 var x = parseFloat(target.getAttribute("cx")) || pos[0];
-//                 x = x + margin.left;
-//                 var x0 = borderWidth;
-//                 var xn = containerWidth-borderWidth;
-//                 var y1 = -20;
-//                 var y2 = -5;
-//                 var y3 = rectWidth*2+20;
-//                 var tilt1 = 16;
-//                 var tilt2 = 16;
-//
-//                 if (x>xn-tilt2) {
-//                     tilt1 = 50;
-//                     tilt2 = -18;
-//                 }
-//                 var posArr = [x+" "+y1, (x-tilt1)+" "+y2, x0+" "+y2, x0 + " "+y3,
-//                     xn+" "+y3, xn+" "+y2, (x+tilt2)+" "+y2, x+" "+y1];
-//                 var noteStr = posArr.join(" L ");//lineto
-//                 hrDataArea
-//                     .append("g")
-//                     .attr("class", "hour-data-border")
-//                     .attr("width", containerWidth)
-//                     .attr("height", rectWidth + 50)
-//                     .attr("transform", "translate(0," + (-14) + ")")
-//                     .append("path")
-//                     .attr("d", "m " + noteStr + " z")
-//                     .style({"stroke-width": borderWidth, "stroke": "green"})
-//                     .style("fill", "none");
-//                 d3.event.stopPropagation();
-//             });
+            .on('mouseout', tip.hide)
+            .on('mousedown', function(d) {
+                d3.select("#hrData").remove();
+                if (d.diagnostic === "No Supply-air Temperature Reset Dx" ||
+                    d.diagnostic === "No Static Pressure Reset Dx" ||
+                    (d.diagnostic === "Operational Schedule Dx"
+                        && d.diagnostic_message === "Supply fan is operating excessively during unoccupied times.") ||
+                    d.diagnostic === "") {
+                    return;
+                }
+                //DetailedArea has 3 <g> elements: border, label, hrDataArea (actual drawing)
+                var rectWidth = 24;
+                var yDomainData = makeArray(1,24);
+                var hrScale = d3.scale.ordinal()
+                        .domain(yDomainData)
+                        .rangeRoundBands([0, 24*rectWidth]);
+                var hrAxis = d3.svg.axis()
+                        .scale(hrScale)
+                        .orient("bottom");
+                var drawPosition = margin.left + 25;
+
+                var hrDataArea = svg
+                    .append("g")
+                    .attr("id", "hrData")
+                    .attr("width", 24*rectWidth)
+                    .attr("height", rectWidth)
+                    .attr("transform", "translate(0," + (height+100) + ")");
+
+                hrDataArea.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(" + drawPosition + ","+ (rectWidth) +")")
+                    .call(hrAxis);
+
+                var hrLabelArea = hrDataArea.append("g")
+                    .attr("class", "axis");
+                hrLabelArea.append("text")
+                    .attr("x", 80)
+                    .attr("y", rectWidth-7)
+                    .text(diagnosticList[d.y]);
+                hrLabelArea.append("text")
+                    .attr("x", 80)
+                    .attr("y", rectWidth+20)
+                    .text('(' + formatFullDate(d.date) + ')');
+
+                hrDataArea.selectAll("rect")
+                .data(d.hourly_result)
+                .enter()
+                .append("rect")
+                .attr("x", function (d) {
+                    return d.y*rectWidth + drawPosition;
+                })
+                .attr("y", 0)
+                .attr("width", rectWidth)
+                .attr("height", rectWidth)
+                .attr("stroke", "grey")
+                .attr("fill", function(d) {
+                    return legends[d.state].color;
+                })
+                .attr("opacity", 1)
+                .style({"stroke-width": 1, "stroke": "black"})
+                .on('mouseover', hrTip.show)
+                .on('mouseout', hrTip.hide);
+
+//                var plot_width =
+//                hrDataArea
+//                    .append("g")
+//                    .attr("class", "hour-data-border")
+//                    .attr("width", containerWidth)
+//                    .attr("height", rectWidth + 50)
+//                    .attr("transform", "translate(0," + (-14) + ")")
+//                    .append("rect")
+//                    .attr("width", containerWidth)
+//                    .attr("height", rectWidth + 50)
+//                    .attr("x", 2)
+//                    .attr("y", 0)
+//                    .attr("fill", "transparent")
+//                    .style({"stroke-width": 1, "stroke": "grey"});
+
+                var borderWidth = 2;
+                var target = d3.event.target || d3.event.srcElement;
+                var pos = d3.mouse(this);
+                var x = parseFloat(target.getAttribute("cx")) || pos[0];
+                x = x + margin.left;
+                var x0 = borderWidth;
+                var xn = containerWidth-borderWidth;
+                var y1 = -20;
+                var y2 = -5;
+                var y3 = rectWidth*2+20;
+                var tilt1 = 16;
+                var tilt2 = 16;
+
+                if (x>xn-tilt2) {
+                    tilt1 = 50;
+                    tilt2 = -18;
+                }
+                var posArr = [x+" "+y1, (x-tilt1)+" "+y2, x0+" "+y2, x0 + " "+y3,
+                    xn+" "+y3, xn+" "+y2, (x+tilt2)+" "+y2, x+" "+y1];
+                var noteStr = posArr.join(" L ");//lineto
+                hrDataArea
+                    .append("g")
+                    .attr("class", "hour-data-border")
+                    .attr("width", containerWidth)
+                    .attr("height", rectWidth + 50)
+                    .attr("transform", "translate(0," + (-14) + ")")
+                    .append("path")
+                    .attr("d", "m " + noteStr + " z")
+                    .style({"stroke-width": borderWidth, "stroke": "green"})
+                    .style("fill", "none");
+                d3.event.stopPropagation();
+            });
         zoomed();
 
         return svg[0];
@@ -961,7 +946,6 @@ $(function() {
             params.push('building='+building);
             params.push('dx='+dx);
             params.push('unit='+device);
-            params.push('aggr='+aggr);
             if (start_time != '') {
                 params.push('start=' + start_time);
             }
@@ -970,7 +954,7 @@ $(function() {
             }
             $.ajax({
                 type: 'GET',
-                url: vc_server + '/2?' + params.join('&'),
+                url: vc_server + '/3?' + params.join('&'),
                 success: function(data){
                     //parse data to conform w/ the old way of data handling
                     if (data['result'].hasOwnProperty('values')) {
@@ -1023,7 +1007,6 @@ $(function() {
                         topicData.forEach(function(dx_msg){
                             var newItem = {};
                             var sensLvl = $("#sensitive").val();
-                            var aggrDays = $("#aggregation").val();
                             var err_code = dx_msg[1][sensLvl]; //dx_msg[1].toString();
                             err_code = err_code.toFixed(1);
                             switch(err_code.substr(-2))
@@ -1112,6 +1095,13 @@ $(function() {
     function query_topics() {
         var air_rcx_prefix = [prefix, air_rcx].join('/');
         var econ_rcx_prefix = [prefix, econ_rcx].join('/');
+        var token = $('#token').val();
+        var post_data = {
+            jsonrpc: '2.0',
+            method: 'platform.historian.get_topic_list',
+            authorization: token,
+            id: req_id
+        };
         $.ajax({
             type: 'GET',
             url: vc_server + '/1',
@@ -1189,6 +1179,9 @@ $(function() {
       var b = s.split(/\D/);
       return new Date(b[0], b[1]-1, b[2], b[3], b[4], b[5]);
     }
+
+
+
 
     function start_diagnostic() {
         $('#login-form').hide();

@@ -43,6 +43,30 @@ class Afdd(Resource):
 
         self.topics = {}
         self.topics_pull_time = None
+        self.points_available = {
+            econ_rcx: ['diagnostic message', 'energy impact'],
+            air_rcx: ['diagnostic message']
+        }
+        self.algo_set = {
+            econ_rcx: [
+                'Temperature Sensor Dx',
+                'Not Economizing When Unit Should Dx',
+                'Economizing When Unit Should Not Dx',
+                'Excess Outdoor-air Intake Dx',
+                'Insufficient Outdoor-air Intake Dx'
+            ],
+            air_rcx: [
+                'Duct Static Pressure Set Point Control Loop Dx',
+                'High Duct Static Pressure Dx',
+                'High Supply-air Temperature Dx',
+                'Low Duct Static Pressure Dx',
+                'Low Supply-air Temperature Dx',
+                'No Static Pressure Reset Dx',
+                'No Supply-air Temperature Reset Dx',
+                'Operational Schedule Dx',
+                'Supply-air Temperature Set Point Control Loop Dx'
+            ]
+        }
 
     def query_topics(self):
         ret_val = []
@@ -69,34 +93,11 @@ class Afdd(Resource):
         ret_val = {"result": ret_val}
         return ret_val
 
-    def query_data(self,
-                   site, building, unit,
-                   dx,
-                   start, end, aggr):
-        points_available = {
-            econ_rcx: ['diagnostic message', 'energy impact'],
-            air_rcx: ['diagnostic message']
-        }
-        algo_set = {
-            econ_rcx: [
-                'Temperature Sensor Dx',
-                'Not Economizing When Unit Should Dx',
-                'Economizing When Unit Should Not Dx',
-                'Excess Outdoor-air Intake Dx',
-                'Insufficient Outdoor-air Intake Dx'
-            ],
-            air_rcx: [
-                'Duct Static Pressure Set Point Control Loop Dx',
-                'High Duct Static Pressure Dx',
-                'High Supply-air Temperature Dx',
-                'Low Duct Static Pressure Dx',
-                'Low Supply-air Temperature Dx',
-                'No Static Pressure Reset Dx',
-                'No Supply-air Temperature Reset Dx',
-                'Operational Schedule Dx',
-                'Supply-air Temperature Set Point Control Loop Dx'
-            ]
-        }
+    def query_data_to_bin(self,
+                          site, building, unit,
+                          dx,
+                          start, end, aggr):
+        # aggr is in hour
 
         # Update topics before querying data
         self.query_topics()
@@ -105,8 +106,8 @@ class Afdd(Resource):
         topic_ids = []
         topic_bins = []  # Contains both message and energy impact
         base_topic = '/'.join([prefix, dx, site, building, unit])
-        for algo in algo_set[dx]:
-            for point in points_available[dx]:
+        for algo in self.algo_set[dx]:
+            for point in self.points_available[dx]:
                 topic_name = '/'.join([base_topic, algo, point])
                 if topic_name in self.topics:
                     topic_ids.append(self.topics[topic_name])
@@ -118,7 +119,7 @@ class Afdd(Resource):
         cur_date = start
         while cur_date <= end:
             new_bin = {'start': cur_date}
-            cur_date = cur_date + timedelta(days=aggr)
+            cur_date = cur_date + timedelta(hours=aggr)
             new_bin['end'] = cur_date - timedelta(seconds=1)
             ts_bins.append(new_bin)
         bins = []
@@ -155,18 +156,87 @@ class Afdd(Resource):
         records = data_cur[:]
         for record in records:
             ts = record['ts']
+            ts = pytz.utc.localize(ts)
             topic_id = record['topic_id']
             values = json.loads(record['value']['string_value'])  # high,normal,low
-            ts = self.local_tz.localize(record['ts'])
-            ts = ts.astimezone(pytz.utc)
-            topic_id = record['topic_id']
-            values = json.loads(record['value']['string_value'])  # high,normal,low
+            #ts = self.local_tz.localize(record['ts'])
+            #ts = ts.astimezone(pytz.utc)
             bin = self.get_bin(bins, topic_id, ts)
             if bin is None:
                 raise 'Cannot find bin ' + topic_id
             # if topic_id == ObjectId("59b2f6efc56e526d3856d5ca"):
             #     x = 1
             bin['values'].append(values)
+
+        return bins
+
+    def query_data(self, site, building, unit, dx, start, end, aggr):
+        bins = self.query_data_to_bin(site, building, unit, dx, start, end, 1)
+
+        # Produce output
+        output = {'result': {
+            'values': {}
+        }}
+        for bin in bins:
+            values = bin['values']
+            if len(values) > 0:
+                high = low = normal = -9999
+                for value in values:
+                    high_postfix = self.get_fault_postfix(high)
+                    low_postfix = self.get_fault_postfix(low)
+                    normal_postfix = self.get_fault_postfix(normal)
+
+                    # high fault
+                    code = round(float(value['high']), 1)
+                    postfix = self.get_fault_postfix(code)
+                    if high == -9999:
+                        high = code
+                    elif postfix == 1:  # RED
+                        high = code
+                    elif postfix == 2 and high_postfix != 1:  # GREY and current code is not RED
+                        high = code
+                    elif postfix == 0 and high_postfix == 3:  # GREEN and current code is not WHITE
+                        high = code
+
+                    # low fault
+                    code = round(float(value['low']), 1)
+                    postfix = self.get_fault_postfix(code)
+                    if low == -9999:
+                        low = code
+                    elif postfix == 1:  # RED
+                        low = code
+                    elif postfix == 2 and low_postfix != 1:  # GREY and current code is not RED
+                        low = code
+                    elif postfix == 0 and low_postfix == 3:  # GREEN and current code is not WHITE
+                        low = code
+
+                    # normal fault
+                    code = round(float(value['normal']), 1)
+                    postfix = self.get_fault_postfix(code)
+                    if normal == -9999:
+                        normal = code
+                    elif postfix == 1:  # RED
+                        normal = code
+                    elif postfix == 2 and normal_postfix != 1:  # GREY and current code is not RED
+                        normal = code
+                    elif postfix == 0 and normal_postfix == 3:  # GREEN and current code is not WHITE
+                        normal = code
+
+                bin_output = [
+                    # Return data with local timezone where Dx occurs
+                    format_ts(bin['end'].astimezone(self.local_tz)),
+                    {'high': high, 'low': low, 'normal': normal}
+                ]
+                if bin['topic_name'] not in output['result']['values']:
+                    output['result']['values'][bin['topic_name']] = []
+
+                output['result']['values'][bin['topic_name']].append(bin_output)
+
+        return output
+
+    def query_aggr_data(self, site, building, unit, dx, start, end, aggr):
+
+        bins = self.query_data_to_bin(site, building, unit, dx, start, end, aggr*24)
 
         # Aggregation values in each bin
         for bin in bins:
@@ -233,16 +303,15 @@ class Afdd(Resource):
         }}
         for bin in bins:
             bin_output = [
-                format_ts(bin['start']),
-                {'high': bin['high'], 'low': bin['low'], 'normal': bin['normal']}]
+                format_ts(bin['end'].astimezone(self.local_tz)),
+                {'high': bin['high'], 'low': bin['low'], 'normal': bin['normal']}
+            ]
             if bin['topic_name'] not in output['result']['values']:
                 output['result']['values'][bin['topic_name']] = []
+
             output['result']['values'][bin['topic_name']].append(bin_output)
 
         return output
-
-        # Merge energy impact bin with dx message bin
-
 
     def aggregate(self, num_fault, num_no_fault, code_fault, code_ok, min_n=3):
         RED = code_fault
@@ -300,7 +369,7 @@ class Afdd(Resource):
         try:
             if resource_id == 1:  # Query topics
                 ret_val = self.query_topics()
-            elif resource_id == 2:  # Query data
+            elif resource_id == 2 or resource_id == 3:  # Query data
                 site = request.args.get('site')
                 building = request.args.get('building')
                 unit = request.args.get('unit')
@@ -328,8 +397,10 @@ class Afdd(Resource):
 
                 start_dt = start_dt.astimezone(pytz.utc)
                 end_dt = end_dt.astimezone(pytz.utc)
-
-                ret_val = self.query_data(site, building, unit, dx, start_dt, end_dt, aggr)
+                if resource_id == 2:
+                    ret_val = self.query_aggr_data(site, building, unit, dx, start_dt, end_dt, aggr)
+                if resource_id == 3:
+                    ret_val = self.query_data(site, building, unit, dx, start_dt, end_dt, aggr)
             output = False
             if output:
                 with open('data.txt', 'w') as outfile:
