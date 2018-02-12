@@ -30,7 +30,7 @@ start_end_delta = 6  # days
 
 class Afdd(Resource):
     def __init__(self):
-        params = {'hostsandports': 'vc-db.pnl.gov', 'user': 'reader',
+        params = {'hostsandports': 'vc-db.pnl.gov,vc-db1.pnl.gov,vc-db2.pnl.go', 'user': 'reader',
                   'passwd': 'volttronReader', 'database': 'analysis', 'auth_src': 'admin'}
         mongo_uri = "mongodb://{user}:{passwd}@{hostsandports}/{database}?authSource={auth_src}"
         mongo_uri = mongo_uri.format(**params)
