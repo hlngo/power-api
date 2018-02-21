@@ -30,13 +30,18 @@ start_end_delta = 6  # days
 
 class Afdd(Resource):
     def __init__(self):
-        params = {'hostsandports': 'vc-db.pnl.gov,vc-db1.pnl.gov,vc-db2.pnl.go', 'user': 'reader',
+        params = {'hostsandports': 'vc-db.pnl.gov,vc-db1.pnl.gov,vc-db2.pnl.gov', 'user': 'reader',
                   'passwd': 'volttronReader', 'database': 'analysis', 'auth_src': 'admin'}
         mongo_uri = "mongodb://{user}:{passwd}@{hostsandports}/{database}?authSource={auth_src}"
         mongo_uri = mongo_uri.format(**params)
-        mongoclient = pymongo.MongoClient(mongo_uri, connect=False)
-        self.mongodb = mongoclient.get_database(params['database'])
-        #self.mongodb = mongoclient.get_default_database()
+
+        # Mongo 2.8 to fix multihost issue
+        mongoclient = pymongo.MongoClient(mongo_uri)
+        self.mongodb = mongoclient.get_default_database()
+
+        # Mong 3.5 issue with using multihost
+        # mongoclient = pymongo.MongoClient(mongo_uri, connect=False)
+        # self.mongodb = mongoclient.get_database(params['database'])
 
         self.local_tz = pytz.timezone('US/Pacific')
         self.delta_in_min = 60  # 15
