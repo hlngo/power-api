@@ -30,7 +30,7 @@ start_end_delta = 6  # days
 
 class Afdd(Resource):
     def __init__(self):
-        params = {'hostsandports': 'vc-db.pnl.gov,vc-db1.pnl.gov,vc-db2.pnl.gov', 'user': 'reader',
+        params = {'hostsandports': 'vc-db.pnl.gov', 'user': 'reader',
                   'passwd': 'volttronReader', 'database': 'analysis', 'auth_src': 'admin'}
         mongo_uri = "mongodb://{user}:{passwd}@{hostsandports}/{database}?authSource={auth_src}"
         mongo_uri = mongo_uri.format(**params)
@@ -101,7 +101,7 @@ class Afdd(Resource):
     def query_data_to_bin(self,
                           site, building, unit,
                           dx,
-                          start, end, aggr):
+                          start, end, aggr, save_raw=False):
         # aggr is in hour
 
         # Update topics before querying data
@@ -173,10 +173,29 @@ class Afdd(Resource):
             #     x = 1
             bin['values'].append(values)
 
+        # Save raw data
+        if save_raw:
+            name = "./data/%s_%s_%s.csv" % (building, unit, dx)
+            content = 'ts,topic_prefix,app,site,building,unit,dx,dx_code,topic_id,high,low,normal\n'
+            for bin in bins:
+                for value in bin['values']:
+                    content += ','.join([bin['start'].strftime('%Y-%m-%d %H:%M:%S'),
+                                         bin['topic_name'].replace('/', ','),
+                                         str(bin['topic_id']),
+                                         str(value['high']),
+                                         str(value['low']),
+                                         str(value['normal']),
+                                         '\n'])
+            with open(name, 'w') as file:
+                file.write(content)
+
         return bins
 
-    def query_data(self, site, building, unit, dx, start, end, aggr):
-        bins = self.query_data_to_bin(site, building, unit, dx, start, end, 1)
+    def query_data(self, site, building, unit, dx, start, end, aggr, save_raw=False):
+        bins = self.query_data_to_bin(site, building, unit, dx, start, end, 1, save_raw)
+
+        if save_raw:
+            return
 
         # Produce output
         output = {'result': {
@@ -239,9 +258,9 @@ class Afdd(Resource):
 
         return output
 
-    def query_aggr_data(self, site, building, unit, dx, start, end, aggr):
+    def query_aggr_data(self, site, building, unit, dx, start, end, aggr, save_raw=False):
 
-        bins = self.query_data_to_bin(site, building, unit, dx, start, end, aggr*24)
+        bins = self.query_data_to_bin(site, building, unit, dx, start, end, aggr*24, save_raw)
 
         # Aggregation values in each bin
         for bin in bins:
@@ -421,8 +440,25 @@ class Afdd(Resource):
 if __name__ == '__main__':
     afdd = Afdd()
     topics = afdd.query_topics()
-    print(topics)
-    econ = afdd.get(1)
-    print(econ)
-    air = afdd.get(2)
-    print(air)
+
+    site = 'PNNL'
+    building = 'EMSL'
+    #units = ['AHU6', 'AHU7','AHU8','AHU13','AHU20']
+    units = ['AHU6']
+    #dxs = ['EconomizerAIRCx'] #'AirsideAIRCx',
+    dxs = ['EconomizerAIRCx', 'AirsideAIRCx']
+    local_tz = pytz.timezone('US/Pacific')
+    start_dt = local_tz.localize(parser.parse('2017-09-30 00:00:00'))
+    end_dt = local_tz.localize(parser.parse('2018-01-01 12:00:00'))
+    aggr = 1  # hours
+    resource_id = 3
+
+    for unit in units:
+        for dx in dxs:
+            if resource_id == 2:
+                ret_val = afdd.query_aggr_data(site, building, unit, dx, start_dt, end_dt, aggr, save_raw=False)
+            if resource_id == 3:
+                ret_val = afdd.query_data(site, building, unit, dx, start_dt, end_dt, aggr, save_raw=False)
+
+
+
