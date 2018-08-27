@@ -106,7 +106,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 var AppComponent = (function () {
     function AppComponent() {
-        this.title1 = 'PNNL Building 350 - Transactive Control';
+        this.title1 = 'PNNL Building 350 - Peak Load Management';
         this.title2 = 'Intelligent Load Control';
     }
     return AppComponent;
@@ -145,7 +145,7 @@ var Configuration = (function () {
     //public Server: string = "http://ddc.pnl.gov:5000/";
     //public Server: string = "http://172.18.69.117:8080/";
     Configuration.prototype.GetServer = function () {
-        var server = 'http://localhost:8000/api/';
+        var server = 'http://localhost:5000/api/';
         if (window.location.hostname.includes('ddc')) {
             server = 'http://ddc.pnl.gov:5000/api/';
         }
@@ -1069,7 +1069,7 @@ var PowerComponent = (function () {
             },
             xaxis: {
                 title: '<b>Time</b>',
-                tickformat: "%-I %p",
+                // tickformat: "%-I %p",
                 nticks: 30,
                 titlefont: {
                     size: 16
@@ -1101,7 +1101,7 @@ var PowerComponent = (function () {
             name: 'Expected',
             x: [],
             y: [],
-            mode: 'lines+markers',
+            mode: 'lines',
             'line': {
                 width: 3
             }
@@ -1110,7 +1110,7 @@ var PowerComponent = (function () {
             name: 'Target',
             x: [],
             y: [],
-            mode: 'lines+markers',
+            mode: 'lines',
             'line': {
                 width: 3
             }
@@ -1128,8 +1128,11 @@ var PowerComponent = (function () {
         //Initial get
         this._powerDataService.GetAllBaseline(this.viewDate)
             .subscribe(function (data) { return _this.setNewData(data, 0); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllBaseline completed.'); });
-        this._powerDataService.GetAllTarget(this.viewDate)
-            .subscribe(function (data) { return _this.setNewData(data, 1); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllTarget completed.'); });
+        // this._powerDataService.GetAllTarget(this.viewDate)
+        //   .subscribe(
+        //     data => this.setNewData(data, 1),
+        //     error => console.log(error.json().error),
+        //     () => console.log('Get GetAllTarget completed.'));
         this._powerDataService.GetAllPower(this.viewDate, this.func)
             .subscribe(function (data) { return _this.setNewData(data, 2); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPower completed.'); });
         //Timer to pull new dasta
@@ -1166,7 +1169,16 @@ var PowerComponent = (function () {
         var curDateTime = new Date;
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
             var d = data_1[_i];
-            if (traceIdx != 1) {
+            if (traceIdx == 0) {
+                // Baseline
+                newPlotlyData['x'][0].push(d['ts']);
+                newPlotlyData['y'][0].push(d['value']);
+                // Target
+                newPlotlyData['x'][1].push(d['ts']);
+                newPlotlyData['y'][1].push(d['target']);
+            }
+            else if (traceIdx == 2) {
+                // Actual
                 newPlotlyData['x'][traceIdx].push(d['ts']);
                 newPlotlyData['y'][traceIdx].push(d['value']);
             }

@@ -597,8 +597,7 @@ $(function() {
             .html(function(d) {
                 return "Date: <strong>" + formatFullDate(d.date) + "</strong><br/>" +
                     "Diagnostic Message: <strong>" + d.diagnostic_message + "</strong>" + "</strong><br/>" +
-                    "Energy Impact: <strong>" + d.energy_impact + "</strong>" + "</strong><br/>" + //d.energy_impact
-                    "(Click to see hourly result)<br/>";
+                    "Energy Impact: <strong>" + d.energy_impact + "</strong>" + "</strong><br/>";
             });
         var hrTip = d3.tip()
             .attr('class', 'd3-tip')
