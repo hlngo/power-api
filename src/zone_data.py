@@ -34,7 +34,7 @@ class ZoneData(Resource):
             # Crate
             # Get power
             topic = 'PNNL/350_BUILDING/METERS/WholeBuildingPowerWithoutShopAirCompressor'
-            topic = 'PNNL/350_BUILDING/HP1A/OutdoorAirTemperature'
+            topic = 'PNNL/SEB/AHU1/OutdoorAirTemperature'
             start_time = '2018-08-01T00:00:00-07:00'  # US/Pacific time
             end_time = '2018-08-30T08:00:00-07:00'  # US/Pacific time
             limit = 100000

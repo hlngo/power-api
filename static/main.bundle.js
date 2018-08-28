@@ -1126,8 +1126,11 @@ var PowerComponent = (function () {
         };
         this.PlotlyData = [baselineTrace, targetTrace, powerTrace];
         //Initial get
-        this._powerDataService.GetAllBaseline(this.viewDate)
-            .subscribe(function (data) { return _this.setNewData(data, 0); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllBaseline completed.'); });
+        // this._powerDataService.GetAllBaseline(this.viewDate)
+        //   .subscribe(
+        //     data => this.setNewData(data, 0),
+        //     error => console.log(error.json().error),
+        //     () => console.log('Get GetAllBaseline completed.'));
         // this._powerDataService.GetAllTarget(this.viewDate)
         //   .subscribe(
         //     data => this.setNewData(data, 1),
@@ -1171,16 +1174,19 @@ var PowerComponent = (function () {
             var d = data_1[_i];
             if (traceIdx == 0) {
                 // Baseline
-                newPlotlyData['x'][0].push(d['ts']);
-                newPlotlyData['y'][0].push(d['value']);
+                // newPlotlyData['x'][0].push(d['ts']);
+                // newPlotlyData['y'][0].push(d['value']);
                 // Target
-                newPlotlyData['x'][1].push(d['ts']);
-                newPlotlyData['y'][1].push(d['target']);
+                // newPlotlyData['x'][1].push(d['ts']);
+                // newPlotlyData['y'][1].push(d['target']);
             }
             else if (traceIdx == 2) {
                 // Actual
                 newPlotlyData['x'][traceIdx].push(d['ts']);
                 newPlotlyData['y'][traceIdx].push(d['value']);
+                // Target
+                newPlotlyData['x'][1].push(d['ts']);
+                newPlotlyData['y'][1].push(d['target']);
             }
             else {
                 //Moment parse non-offset string to UTC by default. Set format to parse to local.
@@ -1574,7 +1580,7 @@ var ZoneComfortComponent = (function () {
             },
             yaxis: {
                 title: 'Temperature (F)',
-                range: [50, 100]
+                range: [50, 110]
             },
             annotations: [],
             shapes: []
