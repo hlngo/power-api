@@ -1574,7 +1574,7 @@ var ZoneComfortComponent = (function () {
             },
             yaxis: {
                 title: 'Temperature (F)',
-                range: [60, 100]
+                range: [50, 100]
             },
             annotations: [],
             shapes: []
