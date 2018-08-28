@@ -1126,18 +1126,18 @@ var PowerComponent = (function () {
         };
         this.PlotlyData = [baselineTrace, targetTrace, powerTrace];
         //Initial get
-        // this._powerDataService.GetAllBaseline(this.viewDate)
-        //   .subscribe(
-        //     data => this.setNewData(data, 0),
-        //     error => console.log(error.json().error),
-        //     () => console.log('Get GetAllBaseline completed.'));
-        // this._powerDataService.GetAllTarget(this.viewDate)
-        //   .subscribe(
-        //     data => this.setNewData(data, 1),
-        //     error => console.log(error.json().error),
-        //     () => console.log('Get GetAllTarget completed.'));
-        this._powerDataService.GetAllPower(this.viewDate, this.func)
-            .subscribe(function (data) { return _this.setNewData(data, 2); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPower completed.'); });
+        if (this.viewDate.indexOf('2017') >= 0) {
+            this._powerDataService.GetAllBaseline(this.viewDate)
+                .subscribe(function (data) { return _this.setNewData(data, 0); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllBaseline completed.'); });
+            this._powerDataService.GetAllTarget(this.viewDate)
+                .subscribe(function (data) { return _this.setNewData(data, 1); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllTarget completed.'); });
+            this._powerDataService.GetAllPower(this.viewDate, this.func)
+                .subscribe(function (data) { return _this.setNewData(data, 2); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPower completed.'); });
+        }
+        else {
+            this._powerDataService.GetAllPowerAug(this.viewDate, this.func)
+                .subscribe(function (data) { return _this.setNewData(data, 10); }, function (error) { return console.log(error.json().error); }, function () { return console.log('Get GetAllPower completed.'); });
+        }
         //Timer to pull new dasta
         // this.timer
         //   .takeWhile(() => this.alive)
@@ -1172,21 +1172,17 @@ var PowerComponent = (function () {
         var curDateTime = new Date;
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
             var d = data_1[_i];
-            if (traceIdx == 0) {
-                // Baseline
-                // newPlotlyData['x'][0].push(d['ts']);
-                // newPlotlyData['y'][0].push(d['value']);
-                // Target
-                // newPlotlyData['x'][1].push(d['ts']);
-                // newPlotlyData['y'][1].push(d['target']);
-            }
-            else if (traceIdx == 2) {
+            if (traceIdx == 10) {
                 // Actual
-                newPlotlyData['x'][traceIdx].push(d['ts']);
-                newPlotlyData['y'][traceIdx].push(d['value']);
+                newPlotlyData['x'][2].push(d['ts']);
+                newPlotlyData['y'][2].push(d['value']);
                 // Target
                 newPlotlyData['x'][1].push(d['ts']);
                 newPlotlyData['y'][1].push(d['target']);
+            }
+            else if (traceIdx != 1) {
+                newPlotlyData['x'][traceIdx].push(d['ts']);
+                newPlotlyData['y'][traceIdx].push(d['value']);
             }
             else {
                 //Moment parse non-offset string to UTC by default. Set format to parse to local.
@@ -1361,6 +1357,7 @@ var PowerDataService = (function () {
         this.allBaselineEndPoint = '1';
         this.allTargetEndPoint = '2';
         this.allPowerEndPoint = '3';
+        this.allPowerEndPointAug = '10';
         this.allPowerWithoutILCEndPoint = '4';
         this.allPowerWithILCEndPoint = '5';
         this.GetAllBaselineVC = function (secureToken) {
@@ -1395,6 +1392,10 @@ var PowerDataService = (function () {
         this.GetAllPower = function (viewDate, func) {
             console.log('Get GetAllPower starting...');
             return _this._http.get(_this.actionUrl + "/" + _this.allPowerEndPoint + "?date=" + viewDate + "&func=" + func, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
+        };
+        this.GetAllPowerAug = function (viewDate, func) {
+            console.log('Get GetAllPower starting...');
+            return _this._http.get(_this.actionUrl + "/" + _this.allPowerEndPointAug + "?date=" + viewDate + "&func=" + func, {}).timeout(30000).map(function (res) { return res.json(); }).catch(_this.handleErrorObservable);
         };
         this.GetAllPowerWithILC = function (viewDate, func, season) {
             console.log('Get GetAllPowerWithILC starting...');
@@ -1622,10 +1623,12 @@ var ZoneComfortComponent = (function () {
         //Hard coded for control day
         var equip = '';
         var point = '';
-        this._zoneDataService.GetZoneData(this.site, this.building, equip, point, this.viewDate)
-            .subscribe(function (data) {
-            _this.setNewData(data, _this.site, _this.building, equip, point, 0);
-        }, function (error) { return console.log(error.json().error); }, function () { return console.log("Get " + _this.site + "/" + _this.building + "/" + equip + "/" + point + " completed."); });
+        if (this.viewDate.indexOf('2017') < 0) {
+            this._zoneDataService.GetZoneData(this.site, this.building, equip, point, this.viewDate)
+                .subscribe(function (data) {
+                _this.setNewData(data, _this.site, _this.building, equip, point, 0);
+            }, function (error) { return console.log(error.json().error); }, function () { return console.log("Get " + _this.site + "/" + _this.building + "/" + equip + "/" + point + " completed."); });
+        }
     }; //ngOnInit
     ZoneComfortComponent.prototype.setNewData = function (data, site, building, equip, point, traceIdx) {
         if (data == null || data['result'])
