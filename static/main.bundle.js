@@ -1574,89 +1574,52 @@ var ZoneComfortComponent = (function () {
             },
             yaxis: {
                 title: 'Temperature (F)',
-                range: [65, 80]
+                range: [60, 100]
             },
-            annotations: [
-                {
-                    text: 'High Limit',
-                    xref: 'paper',
-                    x: 0.99,
-                    y: 78,
-                    yshift: 10,
-                    showarrow: false
-                },
-                {
-                    text: 'Low Limit',
-                    xref: 'paper',
-                    x: 0.99,
-                    y: 68,
-                    yshift: -10,
-                    showarrow: false
-                }
-            ],
-            shapes: [
-                //High limit
-                {
-                    type: 'line',
-                    'xref': 'paper',
-                    'x0': 0,
-                    'y0': 78,
-                    'x1': 1,
-                    'y1': 78,
-                    'line': {
-                        color: 'red',
-                        width: 2
-                    }
-                },
-                //Low limit
-                {
-                    type: 'line',
-                    'xref': 'paper',
-                    'x0': 0,
-                    'y0': 68,
-                    'x1': 1,
-                    'y1': 68,
-                    'line': {
-                        color: 'red',
-                        width: 2.5
-                    }
-                }
-            ]
+            annotations: [],
+            shapes: []
         };
+        // this.PlotlyData = [];
+        // for (let equip of this.equips) {
+        //   for (let point of this.points) {
+        //     this.PlotlyData.push({
+        //       name: `${equip} ${this.pointLabels[point]}`,
+        //       x: [], 
+        //       y: [],
+        //       mode: 'lines'
+        //     });
+        //   }
+        // }
+        //Hardcoded for control day
         this.PlotlyData = [];
-        for (var _i = 0, _a = this.equips; _i < _a.length; _i++) {
-            var equip = _a[_i];
-            for (var _b = 0, _c = this.points; _b < _c.length; _b++) {
-                var point = _c[_b];
-                this.PlotlyData.push({
-                    name: equip + " " + this.pointLabels[point],
-                    x: [],
-                    y: [],
-                    mode: 'lines'
-                });
-            }
-        }
+        this.PlotlyData.push({
+            name: "Outdoor Temperature",
+            x: [],
+            y: [],
+            mode: 'lines'
+        });
         //Initial get
         var idx = 0;
-        var _loop_1 = function (equip) {
-            var _loop_2 = function (point) {
-                var curIdx = idx; //create local scope variable to use with call-back
-                idx++;
-                this_1._zoneDataService.GetZoneData(this_1.site, this_1.building, equip, point, this_1.viewDate)
-                    .subscribe(function (data) {
-                    _this.setNewData(data, _this.site, _this.building, equip, point, curIdx);
-                }, function (error) { return console.log(error.json().error); }, function () { return console.log("Get " + _this.site + "/" + _this.building + "/" + equip + "/" + point + " completed."); });
-            };
-            for (var _i = 0, _a = this_1.points; _i < _a.length; _i++) {
-                var point = _a[_i];
-                _loop_2(point);
-            }
-        };
-        var this_1 = this;
-        for (var _d = 0, _e = this.equips; _d < _e.length; _d++) {
-            var equip = _e[_d];
-            _loop_1(equip);
-        }
+        // for (let equip of this.equips) {
+        //   for (let point of this.points) {
+        //     let curIdx = idx; //create local scope variable to use with call-back
+        //     idx++;
+        //     this._zoneDataService.GetZoneData(this.site, this.building, equip, point, this.viewDate)
+        //       .subscribe(
+        //         data => {
+        //           this.setNewData(data, this.site, this.building, equip, point, curIdx);
+        //         },
+        //         error => console.log(error.json().error),
+        //         () => console.log(`Get ${this.site}/${this.building}/${equip}/${point} completed.`));
+        //   }
+        // }
+        //Hard coded for control day
+        var equip = '';
+        var point = '';
+        this._zoneDataService.GetZoneData(this.site, this.building, equip, point, this.viewDate)
+            .subscribe(function (data) {
+            _this.setNewData(data, _this.site, _this.building, equip, point, 0);
+        }, function (error) { return console.log(error.json().error); }, function () { return console.log("Get " + _this.site + "/" + _this.building + "/" + equip + "/" + point + " completed."); });
     }; //ngOnInit
     ZoneComfortComponent.prototype.setNewData = function (data, site, building, equip, point, traceIdx) {
         if (data == null || data['result'])

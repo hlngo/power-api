@@ -6,6 +6,7 @@ from dateutil import parser
 from datetime import datetime, timedelta
 
 import pymongo
+from crate import client
 
 from utils import format_ts
 
@@ -22,7 +23,54 @@ class ZoneData(Resource):
 
         self.local_tz = pytz.timezone('US/Pacific')
 
+        # Crate
+        self.host = "http://172.18.65.54:4200"
+        self.connection = client.connect(self.host)
+
     def get(self):
+        ret_val = []
+
+        try:
+            # Crate
+            # Get power
+            topic = 'PNNL/350_BUILDING/METERS/WholeBuildingPowerWithoutShopAirCompressor'
+            topic = 'PNNL/350_BUILDING/HP1A/OutdoorAirTemperature'
+            start_time = '2018-08-01T00:00:00-07:00'  # US/Pacific time
+            end_time = '2018-08-30T08:00:00-07:00'  # US/Pacific time
+            limit = 100000
+
+            query = "SELECT ts, double_value " \
+                    "FROM cetc_infrastructure.data " \
+                    "WHERE topic = '{topic}' " \
+                    "AND ts BETWEEN '{start}' AND '{end}' " \
+                    "ORDER BY ts " \
+                    "LIMIT {limit};".format(topic=topic,
+                                            start=start_time,
+                                            end=end_time,
+                                            limit=limit)
+
+            cur = self.connection.cursor()
+            cur.execute(query)
+            records = cur.fetchall()
+
+            for record in records:
+                ts = datetime.fromtimestamp(int(record[0])/1000)
+                # ts = ts.replace(tzinfo=pytz.utc).astimezone(tz=self.local_tz)
+                ret_val.append({
+                    'ts': format_ts(ts),
+                    'value': record[1]
+                })
+
+            if ret_val is not None:
+                ret_val = sorted(ret_val, key=lambda k: k['ts'])
+
+        except Exception, exc:
+            print(exc)
+            return ret_val
+
+        return ret_val
+
+    def get_zone(self):
         ret_val = []
         try:
             topic = request.args.get('topic')
