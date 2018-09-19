@@ -265,7 +265,7 @@ class PowerData(Resource):
                 topic_id = ObjectId("59a09ed9c56e5232abb4e6d7")
 
                 # Hard code for the month of August
-                cur_time = self.local_tz.localize(parser.parse("2018-08-01 00:00:00"))
+                #cur_time = self.local_tz.localize(parser.parse("2018-08-01 00:00:00"))
                 start_date_utc = cur_time.astimezone(pytz.utc)
                 end_date_utc = start_date_utc + timedelta(hours=30 * 24)
 
