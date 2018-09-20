@@ -32,11 +32,23 @@ class ZoneData(Resource):
 
         try:
             # Crate
+            cur_time = request.args.get('date')
+            if cur_time is None or cur_time == '0' or cur_time == 'undefined':
+                cur_time = datetime.now(tz=self.local_tz)
+            else:
+                cur_time = self.local_tz.localize(parser.parse(cur_time))
+            cur_time = cur_time.replace(hour=0, minute=0, second=0, microsecond=0)
+            start_date_utc = cur_time.astimezone(pytz.utc)
+            #end_date_utc = start_date_utc + timedelta(hours=24)
+            end_date_utc = start_date_utc + timedelta(hours=30 * 24)
+
             # Get power
             topic = 'PNNL/350_BUILDING/METERS/WholeBuildingPowerWithoutShopAirCompressor'
             topic = 'PNNL/SEB/AHU1/OutdoorAirTemperature'
-            start_time = '2018-08-01T00:00:00-07:00'  # US/Pacific time
-            end_time = '2018-08-30T08:00:00-07:00'  # US/Pacific time
+            #start_time = '2018-08-01T00:00:00-07:00'  # US/Pacific time
+            #end_time = '2018-08-30T08:00:00-07:00'  # US/Pacific time
+            start_time = start_date_utc.strftime('%Y-%m-%dT%H:%M:%S%z')
+            end_time = end_date_utc.strftime('%Y-%m-%dT%H:%M:%S%z')
             limit = 100000
 
             query = "SELECT ts, double_value " \
