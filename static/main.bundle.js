@@ -1007,21 +1007,22 @@ module.exports = "<div *ngIf=\"PlotlyData\">\n  <plotlychart #targetChart\n    [
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__ = __webpack_require__("../../../../rxjs/Rx.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_observable_interval__ = __webpack_require__("../../../../rxjs/add/observable/interval.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_observable_interval___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_observable_interval__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__ = __webpack_require__("../../../../rxjs/add/operator/map.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_take__ = __webpack_require__("../../../../rxjs/add/operator/take.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_take___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_take__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_takeWhile__ = __webpack_require__("../../../../rxjs/add/operator/takeWhile.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_takeWhile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_takeWhile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_power_data_service__ = __webpack_require__("../../../../../src/app/services/power-data.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__ = __webpack_require__("../../../../../src/app/services/authentication.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__ = __webpack_require__("../../../../../src/app/plotly/plotly.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment__ = __webpack_require__("../../../../moment/moment.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__ = __webpack_require__("../../../../rxjs/Rx.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_observable_interval__ = __webpack_require__("../../../../rxjs/add/observable/interval.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_observable_interval___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_observable_interval__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_map__ = __webpack_require__("../../../../rxjs/add/operator/map.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_map__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_take__ = __webpack_require__("../../../../rxjs/add/operator/take.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_take___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_take__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_takeWhile__ = __webpack_require__("../../../../rxjs/add/operator/takeWhile.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_takeWhile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_takeWhile__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_power_data_service__ = __webpack_require__("../../../../../src/app/services/power-data.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_authentication_service__ = __webpack_require__("../../../../../src/app/services/authentication.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__plotly_plotly_component__ = __webpack_require__("../../../../../src/app/plotly/plotly.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_moment__ = __webpack_require__("../../../../moment/moment.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_moment__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PowerComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1032,6 +1033,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+
 
 //import {Observable} from 'rxjs/Observable';
 
@@ -1044,17 +1046,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 var PowerComponent = (function () {
-    function PowerComponent(_powerDataService, _authService) {
+    function PowerComponent(_powerDataService, _authService, _route, _router) {
         this._powerDataService = _powerDataService;
         this._authService = _authService;
+        this._route = _route;
+        this._router = _router;
         this.DisplayData = false;
         this.Replaying = false;
+        this.LocalTarget = -1;
         this.alive = true;
         this.interval = 1000;
-        this.timer = __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__["Observable"].timer(this.interval, this.interval);
+        this.timer = __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__["Observable"].timer(this.interval, this.interval);
     }
     PowerComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.sub = this._route
+            .queryParams
+            .subscribe(function (params) {
+            _this.LocalTarget = params['target'];
+        });
         this.PlotlyId = 'power_plot';
         this.PlotlyLayout = {
             title: "",
@@ -1178,7 +1188,11 @@ var PowerComponent = (function () {
                 newPlotlyData['y'][2].push(d['value']);
                 // Target
                 newPlotlyData['x'][1].push(d['ts']);
-                newPlotlyData['y'][1].push(d['target']);
+                var curTarget = this.LocalTarget;
+                if (this.LocalTarget < 0) {
+                    curTarget = d['target'];
+                }
+                newPlotlyData['y'][1].push(curTarget);
             }
             else if (traceIdx != 1) {
                 newPlotlyData['x'][traceIdx].push(d['ts']);
@@ -1186,7 +1200,7 @@ var PowerComponent = (function () {
             }
             else {
                 //Moment parse non-offset string to UTC by default. Set format to parse to local.
-                var myMoment = __WEBPACK_IMPORTED_MODULE_9_moment__(d['ts'], 'YYYY-MM-DDTHH:mm:ss[Z]');
+                var myMoment = __WEBPACK_IMPORTED_MODULE_10_moment__(d['ts'], 'YYYY-MM-DDTHH:mm:ss[Z]');
                 if (myMoment.isBefore(curDateTime)) {
                     newPlotlyData['x'][traceIdx].push(d['ts']);
                     newPlotlyData['y'][traceIdx].push(d['value']);
@@ -1200,6 +1214,7 @@ var PowerComponent = (function () {
     };
     PowerComponent.prototype.ngOnDestroy = function () {
         this.alive = false;
+        this.sub.unsubscribe();
     };
     return PowerComponent;
 }());
@@ -1217,19 +1232,19 @@ __decorate([
 ], PowerComponent.prototype, "func", void 0);
 __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_11" /* ViewChild */])('targetChart'),
-    __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
+    __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_9__plotly_plotly_component__["a" /* PlotlyComponent */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_9__plotly_plotly_component__["a" /* PlotlyComponent */]) === "function" && _a || Object)
 ], PowerComponent.prototype, "targetChart", void 0);
 PowerComponent = __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_12" /* Component */])({
         selector: 'app-power',
         template: __webpack_require__("../../../../../src/app/power/power.component.html"),
         styles: [__webpack_require__("../../../../../src/app/power/power.component.css")],
-        providers: [__WEBPACK_IMPORTED_MODULE_6__services_power_data_service__["a" /* PowerDataService */], __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__["a" /* AuthenticationService */]]
+        providers: [__WEBPACK_IMPORTED_MODULE_7__services_power_data_service__["a" /* PowerDataService */], __WEBPACK_IMPORTED_MODULE_8__services_authentication_service__["a" /* AuthenticationService */]]
     }),
-    __metadata("design:paramtypes", [typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_6__services_power_data_service__["a" /* PowerDataService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__services_power_data_service__["a" /* PowerDataService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__["a" /* AuthenticationService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__services_authentication_service__["a" /* AuthenticationService */]) === "function" && _c || Object])
+    __metadata("design:paramtypes", [typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_7__services_power_data_service__["a" /* PowerDataService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__services_power_data_service__["a" /* PowerDataService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_8__services_authentication_service__["a" /* AuthenticationService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__services_authentication_service__["a" /* AuthenticationService */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* ActivatedRoute */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* ActivatedRoute */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["c" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_router__["c" /* Router */]) === "function" && _e || Object])
 ], PowerComponent);
 
-var _a, _b, _c;
+var _a, _b, _c, _d, _e;
 //# sourceMappingURL=power.component.js.map
 
 /***/ }),
